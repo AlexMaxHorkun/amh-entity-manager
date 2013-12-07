@@ -103,10 +103,10 @@ class EntityManager{
 	*/
 	public function removeRepository($repo){
 		if($repo instanceof Repository && $this->hasRepository($repo)){
-			unset($this->repos[$repo->getName()];
+			unset($this->repos[$repo->getName()]);
 			return TRUE;
 		}
-		elseif(isset($this->repos[(string)$repo)){
+		elseif(isset($this->repos[(string)$repo])){
 			unset($this->repos[(string)$repo]);
 			return TRUE;
 		}
