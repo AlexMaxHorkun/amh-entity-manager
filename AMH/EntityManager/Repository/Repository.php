@@ -146,7 +146,11 @@ class Repository{
 	@return EntityInterface|null
 	*/
 	public function findOneBy(array $filter=array()){
-		return $this->find($filter,1);
+		$res=$this->findBy($filter,1);
+		
+		if($res) return $res[0];
+		
+		return NULL;
 	}
 }
 ?>
