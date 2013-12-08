@@ -143,11 +143,15 @@ class Repository{
 	
 	@throws \RuntimeException.
 	*/
-	//TODO
 	public function findBy(array $filter=array(), $limit=0){
+		/*forst look in entities prop, add resulting Entities' IDs to an array,
+		then look in cache, givin $not_in_ids to it, add resulting Entities' IDs to that array,
+		and finaly look for entities in DB through mapper
+		*/
 		if($limit<0) $limit=0;
+		$found=array();//Entities found
 		
-		$is_enough=function(array $items) use($limit){
+		$isEnough=function() use($found,$limit){
 			if(!$limit) return FALSE;
 			if(count($items)>$limit)
 				return array_slice($items,0,$limit);
@@ -155,31 +159,44 @@ class Repository{
 				return $items;
 			else return FALSE;
 		};
-	
-		$found=array();//Entities found
-		/*forst look in entities prop, add resulting Entities' IDs to an array,
-		then look in cache, givin $not_in_ids to it, add resulting Entities' IDs to that array,
-		and finaly look for entities in DB through mapper
-		*/
-		$found=$this->findStored(array(), $filter, $limit);
-		if($res=$is_enough($found)) return $res;
+		
+		$extractIds=function() use($found){
+			$ids=array();
+			foreach($found as $e){
+				if($e->id()) $ids[]=$e->id();
+			}
+			
+			return $ids;
+		};
+		
+		$found=$this->findStored($filter, $limit);
+		if($res=$isEnough()) return $res;
 		unset($res);
 		
 		//Work with cache similar to mapper
-		//TODO
+		if($this->cache){
+			$cache_found=$this->findInCache($filter,$limit,$extractIds());
+			if($cache_found){
+				$this->addAllToStore($cache_found);
+				$found=array_merge($found,$cache_found);
+			}
+			unset($cache_found);
+		}
+		if($res=$isEnough()) return $res;
+		
 		//Working with mapper
 		if(!$this->mapper){
 			throw new \RuntimeException('Cannot find entities without mapper');
 			return NULL;
 		}
-		$mapper_found=$this->mapper->find(array(),$filter,$limit,self::extractEntitiesIds($found));
+		$mapper_found=$this->findInDB($filter,$limit,$extractIds());
 		if($mapper_found){
 			$this->addAllToStore($mapper_found);
 			$found=array_merge($found,$mapper_found);
 		}
 		unset($mapper_found);
 		
-		if($res=$is_enough($found)) return $res;
+		if($res=$isEnough()) return $res;
 		return $found;
 	}
 	/**
@@ -238,6 +255,32 @@ class Repository{
 	*/
 	protected function clearStored(){
 		$this->entities=array();
+	}
+	/**
+	Looks for entities in db.
+	
+	@param array $filter Criteria.
+	@param int $limit
+	@param array of (int)IDs not to look for.
+	
+	@return array of AbstractEntity.
+	*/
+	//TODO
+	private function findInDB(array $filter=array(), $limit=0, array $not_in_ids=array()){
+	
+	}
+	/**
+	Looks for entities in cache.
+	
+	@param array $filter Criteria.
+	@param int $limit
+	@param array of (int)IDs not to look for.
+	
+	@return array of AbstractEntity.
+	*/
+	//TODO
+	private function findInCache(array $filter=array(), $limit=0, array $not_in_ids=array()){
+	
 	}
 	/**
 	Untracks entity object.
