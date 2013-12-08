@@ -240,21 +240,6 @@ class Repository{
 		$this->entities=array();
 	}
 	/**
-	Extacts entities' IDs from array.
-	
-	@param array Of AbstractEntity.
-	
-	@return array Of int.
-	*/
-	private static function extractEntitiesIds(array $es){
-		$ids=array();
-		foreach($es as $e){
-			if($e->id()) $ids[]=$e->id();
-		}
-		
-		return $ids;
-	}
-	/**
 	Untracks entity object.
 	*/
 	//TODO
