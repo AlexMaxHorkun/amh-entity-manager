@@ -1,7 +1,7 @@
 <?php
 namespace AMH\EntityManager\Repository;
 
-use AMH\EntityManager\Entity\EntityInterface;
+use AMH\EntityManager\Entity\AbstractEntity;
 use AMH\EntityManager\Repository\Mapper\MapperInterface;
 use AMH\EntityManager\Cache\CacheInterface;
 use AMH\EntityManager\EntityManager;
@@ -123,7 +123,7 @@ class Repository{
 	/**
 	Finds Entity by ID.
 	
-	@return EntityInterface
+	@return AbstractEntity
 	*/
 	//TODO
 	public function find($id){
@@ -139,7 +139,7 @@ class Repository{
 	/**
 	Finds Entities by criteria.
 	
-	@return array|null of EntityInterface.
+	@return array|null of AbstractEntity.
 	
 	@throws \RuntimeException.
 	*/
@@ -185,7 +185,7 @@ class Repository{
 	/**
 	Finds one entity by criteria.
 	
-	@return EntityInterface|null
+	@return AbstractEntity|null
 	*/
 	public function findOneBy(array $filter=array()){
 		$res=$this->findBy($filter,1);
@@ -195,7 +195,7 @@ class Repository{
 		return NULL;
 	}
 	/**
-	@return array of EntityInterface.
+	@return array of AbstractEntity.
 	*/
 	public function findAll(){
 		return $this->findBy();
@@ -216,17 +216,17 @@ class Repository{
 	/**
 	Adds entity to object's storage.
 	
-	@param EntityInterface $e Entity.
+	@param AbstractEntity $e Entity.
 	@param int Flush action.
 	*/
 	//TODO
-	protected function addToStore(EntityInterface $e, $f_action=self::FLUSH_ACTION_NONE){
+	protected function addToStore(AbstractEntity $e, $f_action=self::FLUSH_ACTION_NONE){
 	
 	}
 	/**
 	Adds multiple entities to object's storage.
 	
-	@param array $es Of EntityInterface.
+	@param array $es Of AbstractEntity.
 	@param int $f_action Flush action for all entities.
 	*/
 	protected function addAllToStore(array $es, $f_action=self::FLUSH_ACTION_NONE){
@@ -243,7 +243,7 @@ class Repository{
 	/**
 	Extacts entities' IDs from array.
 	
-	@param array Of EntityInterface.
+	@param array Of AbstractEntity.
 	
 	@return array Of int.
 	*/
@@ -254,6 +254,13 @@ class Repository{
 		}
 		
 		return $ids;
+	}
+	/**
+	Untracks entity object.
+	*/
+	//TODO
+	public function untrack(AbstractEntity $e){
+	
 	}
 }
 ?>
