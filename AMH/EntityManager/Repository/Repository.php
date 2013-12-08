@@ -138,7 +138,10 @@ class Repository{
 	*/
 	//TODO
 	public function findBy(array $filter=array(), $limit=0){
-	
+		/*forst look in entities prop, add resulting Entities' IDs to an array,
+		then look in cache, givin $not_in_ids to it, add resulting Entities' IDs to that array,
+		and finaly look for entities in DB through mapper
+		*/
 	}
 	/**
 	Finds one entity by criteria.
@@ -151,6 +154,12 @@ class Repository{
 		if($res) return $res[0];
 		
 		return NULL;
+	}
+	/**
+	@return array of EntityInterface.
+	*/
+	public function findAll(){
+		return $this->findBy();
 	}
 }
 ?>
