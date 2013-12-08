@@ -138,6 +138,7 @@ class Repository{
 	*/
 	//TODO
 	public function findBy(array $filter=array(), $limit=0){
+		$found=array();//Entities found
 		/*forst look in entities prop, add resulting Entities' IDs to an array,
 		then look in cache, givin $not_in_ids to it, add resulting Entities' IDs to that array,
 		and finaly look for entities in DB through mapper
@@ -160,6 +161,29 @@ class Repository{
 	*/
 	public function findAll(){
 		return $this->findBy();
+	}
+	/**
+	Looks for entities stored in prop.
+	
+	@param array $ids of IDs, if given filter entities only by their IDs.
+	@param array $filter Criteria.
+	@param int $limit
+	
+	@return array
+	*/
+	//TODO
+	protected function findStoredEntities(array $ids=array(), array $filter=array(), $limit=0){
+		return array();
+	}
+	/**
+	Adds entity to object storage.
+	
+	@param EntityInterface $e Entity.
+	@param int Flush action.
+	*/
+	//TODO
+	protected function addToStore(EntityInterface $e, $f_action=self::FLUSH_ACTION_NONE){
+	
 	}
 }
 ?>
