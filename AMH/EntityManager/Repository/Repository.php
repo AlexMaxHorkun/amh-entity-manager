@@ -274,10 +274,6 @@ class Repository{
 			return;
 		}
 		$res=$this->mapper->find($filter,$limit,$not_in_ids);
-		/*$es=array();
-		foreach($res as $data){
-			$es[]=$this->hydrator->createFrom($data);
-		}*/
 		if($res){
 			$this->addAllToStore($res);
 		}
