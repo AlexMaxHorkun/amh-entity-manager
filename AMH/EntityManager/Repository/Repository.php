@@ -162,7 +162,8 @@ class Repository{
 		and finaly look for entities in DB through mapper
 		*/
 		$found=$this->findStored($filter, $limit);
-		if($is_enough($found)) return $is_enough($found);
+		if($res=$is_enough($found)) return $res;
+		unset($res);
 		
 		//Work with cache similar to mapper
 		//TODO
@@ -178,7 +179,7 @@ class Repository{
 		}
 		unset($mapper_found);
 		
-		if($is_enough($found)) return $is_enough($found);
+		if($res=$is_enough($found)) return $res;
 		return $found;
 	}
 	/**
