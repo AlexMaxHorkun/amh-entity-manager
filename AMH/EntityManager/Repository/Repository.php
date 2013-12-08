@@ -181,7 +181,7 @@ class Repository{
 		return array();
 	}
 	/**
-	Adds entity to object storage.
+	Adds entity to object's storage.
 	
 	@param EntityInterface $e Entity.
 	@param int Flush action.
@@ -189,6 +189,17 @@ class Repository{
 	//TODO
 	protected function addToStore(EntityInterface $e, $f_action=self::FLUSH_ACTION_NONE){
 	
+	}
+	/**
+	Adds multiple entities to object's storage.
+	
+	@param array $es Of EntityInterface.
+	@param int $f_action Flush action for all entities.
+	*/
+	protected function addAllToStore(array $es, $f_action=self::FLUSH_ACTION_NONE){
+		foreach($es as $e){
+			$this->addToStore($e,$f_action);
+		}
 	}
 	/**
 	Clears stored entities.
