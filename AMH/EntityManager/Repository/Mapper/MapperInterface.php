@@ -2,6 +2,7 @@
 namespace AMH\EntityManager\Repository\Mapper;
 
 use \AMH\EntityManager\Entity\EntityInterface;
+use AMH\EntityManager\Repository\Repository;
 
 /**
 @author Alex Horkun
@@ -35,5 +36,13 @@ interface MapperInterface{
 	@return void
 	*/
 	public function remove(EntityInterface $e);
+	/**
+	@return void
+	*/
+	public function setRepository(Repository $r);
+	/**
+	@return Repository
+	*/
+	public function getRepository();
 }
 ?>
