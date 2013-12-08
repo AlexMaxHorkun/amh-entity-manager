@@ -140,14 +140,46 @@ class Repository{
 	Finds Entities by criteria.
 	
 	@return array|null of EntityInterface.
+	
+	@throws \RuntimeException.
 	*/
 	//TODO
 	public function findBy(array $filter=array(), $limit=0){
+		if($limit<0) $limit=0;
+		
+		$is_enough=function(array $items) use($limit){
+			if(!$limit) return FALSE;
+			if(count($items)>$limit)
+				return array_slice($items,0,$limit);
+			elseif($count($items)==$limit)
+				return $items;
+			else return FALSE;
+		}
+	
 		$found=array();//Entities found
 		/*forst look in entities prop, add resulting Entities' IDs to an array,
 		then look in cache, givin $not_in_ids to it, add resulting Entities' IDs to that array,
 		and finaly look for entities in DB through mapper
 		*/
+		$found=$this->findStored($filter, $limit);
+		if($is_enough($found)) return $is_enough($found);
+		
+		//Work with cache similar to mapper
+		//TODO
+		//Working with mapper
+		if(!$this->mapper){
+			throw new \RuntimeException('Cannot find entities without mapper');
+			return NULL;
+		}
+		$mapper_found=$this->mapper->find(array(),$filter,$limit,self::extractEntitiesIds($found));
+		if($mapper_found){
+			$this->addAllToStore($mapper_found);
+			$found=array_merge($found,$mapper_found);
+		}
+		unset($mapper_found);
+		
+		if($is_enough($found)) return $is_enough($found);
+		return $found;
 	}
 	/**
 	Finds one entity by criteria.
@@ -206,6 +238,21 @@ class Repository{
 	*/
 	protected function clearStored(){
 		$this->entities=array();
+	}
+	/**
+	Extacts entities' IDs from array.
+	
+	@param array Of EntityInterface.
+	
+	@return array Of int.
+	*/
+	private static function extractEntitiesIds(array $es){
+		$ids=array();
+		foreach($es as $e){
+			if($e->id()) $ids[]=$e->id();
+		}
+		
+		return $ids;
 	}
 }
 ?>
