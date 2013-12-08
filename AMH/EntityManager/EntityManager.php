@@ -1,8 +1,8 @@
 <?php
 namespace AMH\EntityManager;
 
-use Cache\CacheInterface;
-use Repository\Repository;
+use AMH\EntityManager\Cache\CacheInterface;
+use AMH\EntityManager\Repository\Repository;
 
 /**
 @author Alex Horkun mindkilleralexs@gmail.com
