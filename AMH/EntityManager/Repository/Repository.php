@@ -2,7 +2,7 @@
 namespace AMH\EntityManager\Repository;
 
 use AMH\EntityManager\Entity\EntityInterface;
-use Mapper\MapperInterface;
+use AMH\EntityManager\Repository\Mapper\MapperInterface;
 use AMH\EntityManager\Cache\CacheInterface;
 use AMH\EntityManager\EntityManager;
 
