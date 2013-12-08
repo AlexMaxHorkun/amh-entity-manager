@@ -12,6 +12,11 @@ use AMH\EntityManager\EntityManager;
 Repository is used to work with Mapper and to store entitties in memory and cache.
 */
 class Repository{
+	const FLUSH_ACTION_NONE=0;
+	const FLUSH_ACTION_INSERT=1;
+	const FLUSH_ACTION_UPDATE=2;
+	const FLUSH_ACTION_REMVOE=3;
+	
 	/**
 	@var array of Entities and flush action information.
 	*/
