@@ -81,6 +81,9 @@ class Repository{
 	public function setMapper(Mapper $mapper){
 		$this->mapper=$mapper;
 		$this->mapper->setRepository($this);
+		if(!$this->mapper->getHydrator()&&$this->hydrator){
+			$this->mapper->setHydrator($this->hydrator);
+		}
 	}
 	/**
 	@return Mapper
@@ -95,6 +98,9 @@ class Repository{
 	
 	public function setHydrator(Hydrator $hydr){
 		$this->hydrator=$hydr;
+		if(!$this->mapper->getHydrator()){
+			$this->mapper->setHydrator($this->hydrator);
+		}
 	}
 	/**
 	@return Hydrator
