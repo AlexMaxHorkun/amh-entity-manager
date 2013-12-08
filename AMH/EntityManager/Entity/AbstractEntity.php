@@ -14,10 +14,6 @@ abstract class AbstractEntity{
 	*/
 	private $id=NULL;
 	/**
-	@var bool
-	*/
-	private $loaded=FALSE;
-	/**
 	@var Repository
 	*/
 	private $repo=NULL;
@@ -47,7 +43,7 @@ abstract class AbstractEntity{
 	@return bool
 	*/
 	protected function isLoaded(){
-		return $this->loaded;
+		return $this->repo->isLoaded($this);
 	}
 	
 	public function setRepository(Repository $r){
