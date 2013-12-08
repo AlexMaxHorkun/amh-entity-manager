@@ -154,7 +154,7 @@ class Repository{
 			elseif($count($items)==$limit)
 				return $items;
 			else return FALSE;
-		}
+		};
 	
 		$found=array();//Entities found
 		/*forst look in entities prop, add resulting Entities' IDs to an array,
