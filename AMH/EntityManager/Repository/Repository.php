@@ -262,5 +262,19 @@ class Repository{
 	public function untrack(AbstractEntity $e){
 	
 	}
+	/**
+	Marks an entity as dirty.
+	*/
+	//TODO
+	public function dirty(AbstractEntity $e){
+	
+	}
+	/**
+	Loads entity.
+	*/
+	//TODO
+	public function loadOne(AbstractEntity $e){
+		
+	}
 }
 ?>
