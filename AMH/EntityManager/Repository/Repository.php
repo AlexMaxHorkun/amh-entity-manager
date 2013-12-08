@@ -170,18 +170,15 @@ class Repository{
 		};
 		
 		$found=$this->findStored($filter, $limit);
+		
 		if($res=$isEnough()) return $res;
 		unset($res);
 		
 		//Work with cache similar to mapper
 		if($this->cache){
-			$cache_found=$this->findInCache($filter,$limit,$extractIds());
-			if($cache_found){
-				$this->addAllToStore($cache_found);
-				$found=array_merge($found,$cache_found);
-			}
-			unset($cache_found);
+			$found=array_merge($found, $this->findInCache($filter,$limit,$extractIds()));
 		}
+		
 		if($res=$isEnough()) return $res;
 		
 		//Working with mapper
@@ -189,13 +186,8 @@ class Repository{
 			throw new \RuntimeException('Cannot find entities without mapper');
 			return NULL;
 		}
-		$mapper_found=$this->findInDB($filter,$limit,$extractIds());
-		if($mapper_found){
-			$this->addAllToStore($mapper_found);
-			$found=array_merge($found,$mapper_found);
-		}
-		unset($mapper_found);
-		
+		$found=array_merge($found, $this->findInDB($filter,$limit,$extractIds()));	
+			
 		if($res=$isEnough()) return $res;
 		return $found;
 	}
@@ -267,7 +259,21 @@ class Repository{
 	*/
 	//TODO
 	private function findInDB(array $filter=array(), $limit=0, array $not_in_ids=array()){
-	
+		if(!$this->mapper){
+			throw new \RuntimeException("Mapper need's to be set");
+			return;
+		}
+		$res=$this->mapper->find($filter,$limit,$not_in_ids);
+		$es=array();
+		foreach($res as $data){
+			$es[]=$this->hydrator->createFrom($data);
+		}
+		
+		if($es){
+			$this->addAllToStore($es);
+		}
+		
+		return $es;
 	}
 	/**
 	Looks for entities in cache.
