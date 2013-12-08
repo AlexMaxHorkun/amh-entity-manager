@@ -172,7 +172,7 @@ class Repository{
 	@return array
 	*/
 	//TODO
-	protected function findStoredEntities(array $ids=array(), array $filter=array(), $limit=0){
+	protected function findStored(array $ids=array(), array $filter=array(), $limit=0){
 		return array();
 	}
 	/**
