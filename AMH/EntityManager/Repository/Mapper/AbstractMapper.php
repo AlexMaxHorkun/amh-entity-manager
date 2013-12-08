@@ -33,9 +33,57 @@ abstract class MapperInterface{
 	@limit int|null Maxim amount of entities to return.
 	@param array $not_in_ids of Entity IDs.
 	
+	@return array of Entity.
+	*/
+	public function find($filter=array(), $limit=0, $not_in_ids=array()){
+		$data=$this->findEntitiesInitData($filter, $limit, $not_in_ids);
+		if($data){
+			return $this->createEntities($data);
+		}
+		else{
+			return array();
+		}
+	}
+	/**
+	Creates entities from array of array data with hydrator.
+	
+	@throws \RuntimeException if no hydrator provided.
+	@throws \RuntimeException if hydrator returns not an Entity.
+	
+	@param array Data.
+	
+	@return array of Entity.
+	*/
+	protected function createEntities(array $data){
+		if(!$this->hydrator){
+			throw \RuntimeException('No hydrator provided');
+			return;
+		}
+		
+		$es=array();
+		foreach($data as $e_data){
+			$e=$this->hydrator->createFrom($e_data);
+			if($e instanceof Entity){
+				$es[]=$e;
+			}
+			else{
+				throw new \RuntimeException('Hydrator did not return an Entity from createFrom method');
+				return;
+			}
+		}
+		
+		return $es;
+	}
+	/**
+	Finds entities init data (id, relative entities ids).
+	
+	@param array $filter Criteria for records.
+	@limit int|null Maxim amount of entities to return.
+	@param array $not_in_ids of Entity IDs.
+	
 	@return array of (int)IDS and relative entities IDs.
 	*/
-	abstract public function find($filter=array(), $limit=0, $not_in_ids=array());
+	abstract protected function findEntitiesInitData($filter=array(), $limit=0, $not_in_ids=array());
 	/**
 	@param array $ids Of IDs.
 	
@@ -68,6 +116,16 @@ abstract class MapperInterface{
 	*/
 	public function getRepository(){
 		return $this->repo;
+	}
+	
+	public function setHydrator(Hydrator $hydr){
+		$this->hydrator=$hydr;
+	}
+	/**
+	@return Hydrator
+	*/
+	public function getHydrator(){
+		return $this->hydrator;
 	}
 }
 ?>
