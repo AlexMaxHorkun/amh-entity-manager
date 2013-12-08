@@ -68,7 +68,7 @@ class EntityManager{
 			throw new \RuntimeException('Repository with such name already exists.');
 			return;
 		}
-		$this->repos[$repos->getName()]=$repo;
+		$this->repos[$repo->getName()]=$repo;
 	}
 	/**
 	@param string Name of repo needed.
