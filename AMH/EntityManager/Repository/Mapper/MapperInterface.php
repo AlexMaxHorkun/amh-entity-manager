@@ -13,17 +13,21 @@ interface MapperInterface{
 	/**
 	Select operation.
 	
-	If IDs given should filter only by IDs, else ignore it,
 	If not_in_ids given should add to 'where' clause `id` not in (...).
 	
-	@param array $ids Database IDs.
 	@param array $filter Criteria for records.
 	@limit int|null Maxim amount of entities to return.
 	@param array $not_in_ids of Entity IDs.
 	
-	@return array of EntityInterface.
+	@return array of (int)IDS and relative entities IDs.
 	*/
-	public function find(array $ids=array(), $filter=array(), $limit=0, $not_in_ids=array());
+	public function find($filter=array(), $limit=0, $not_in_ids=array());
+	/**
+	@param array $ids Of IDs.
+	
+	@return array of data for hydrator.
+	*/
+	public function load(array $ids);
 	/**
 	@return void
 	*/
