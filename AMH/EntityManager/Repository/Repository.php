@@ -203,14 +203,13 @@ class Repository{
 	/**
 	Looks for entities stored in prop.
 	
-	@param array $ids of IDs, if given filter entities only by their IDs.
 	@param array $filter Criteria.
 	@param int $limit
 	
-	@return array
+	@return array of (int)IDs
 	*/
 	//TODO
-	protected function findStored(array $ids=array(), array $filter=array(), $limit=0){
+	protected function findStored(array $filter=array(), $limit=0){
 		return array();
 	}
 	/**
