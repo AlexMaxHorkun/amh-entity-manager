@@ -190,5 +190,11 @@ class Repository{
 	protected function addToStore(EntityInterface $e, $f_action=self::FLUSH_ACTION_NONE){
 	
 	}
+	/**
+	Clears stored entities.
+	*/
+	protected function clearStored(){
+		$this->entities=array();
+	}
 }
 ?>
