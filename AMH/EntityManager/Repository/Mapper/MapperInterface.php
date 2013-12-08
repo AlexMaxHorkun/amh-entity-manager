@@ -22,7 +22,7 @@ interface MapperInterface{
 	
 	@return array of EntityInterface.
 	*/
-	public function find($ids=array, $filter=array(), $limit=0, $not_in_ids=array());
+	public function find(array $ids=array(), $filter=array(), $limit=0, $not_in_ids=array());
 	/**
 	@return void
 	*/
