@@ -276,5 +276,12 @@ class Repository{
 	public function loadOne(AbstractEntity $e){
 		
 	}
+	/**
+	@return bool
+	*/
+	//TODO
+	public function isLoaded(AbstractEntity $e){
+	
+	}
 }
 ?>
