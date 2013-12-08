@@ -257,7 +257,6 @@ class Repository{
 	
 	@return array of AbstractEntity.
 	*/
-	//TODO
 	private function findInDB(array $filter=array(), $limit=0, array $not_in_ids=array()){
 		if(!$this->mapper){
 			throw new \RuntimeException("Mapper need's to be set");
@@ -284,9 +283,22 @@ class Repository{
 	
 	@return array of AbstractEntity.
 	*/
-	//TODO
 	private function findInCache(array $filter=array(), $limit=0, array $not_in_ids=array()){
-	
+		if(!$this->cache){
+			throw new \RuntimeException("Mapper need's to be set");
+			return;
+		}
+		$res=$this->cache->find($filter,$limit,$not_in_ids);
+		$es=array();
+		foreach($res as $data){
+			$es[]=$this->hydrator->createFrom($data);
+		}
+		
+		if($es){
+			$this->addAllToStore($es);
+		}
+		
+		return $es;
 	}
 	/**
 	Untracks entity object.
