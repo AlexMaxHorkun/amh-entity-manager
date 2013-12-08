@@ -12,17 +12,17 @@ interface MapperInterface{
 	/**
 	Select operation.
 	
-	If ID given should filter only by ID, else ignore it,
+	If IDs given should filter only by IDs, else ignore it,
 	If not_in_ids given should add to 'where' clause `id` not in (...).
 	
-	@param int|null $id Database ID.
+	@param array $ids Database IDs.
 	@param array $filter Criteria for records.
 	@limit int|null Maxim amount of entities to return.
 	@param array $not_in_ids of Entity IDs.
 	
 	@return array of EntityInterface.
 	*/
-	public function find($id=0, $filter=array(), $limit=0, $not_in_ids=array());
+	public function find($ids=array, $filter=array(), $limit=0, $not_in_ids=array());
 	/**
 	@return void
 	*/
