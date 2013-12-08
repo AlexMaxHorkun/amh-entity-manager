@@ -2,7 +2,7 @@
 namespace AMH\EntityManager\Repository;
 
 use AMH\EntityManager\Entity\AbstractEntity;
-use AMH\EntityManager\Repository\Mapper\MapperInterface;
+use AMH\EntityManager\Repository\Mapper\AbstractMapper as Mapper;
 use AMH\EntityManager\Cache\CacheInterface;
 use AMH\EntityManager\EntityManager;
 
@@ -26,7 +26,7 @@ class Repository{
 	*/
 	private $name=NULL;
 	/**
-	@var MapperInterface
+	@var Mapper
 	*/
 	private $mapper=NULL;
 	/**
@@ -44,7 +44,7 @@ class Repository{
 	/**
 	@param string Classname of entities.
 	*/
-	public function __construct($name, HydratorInterface $hydr=NULL, MapperInterface $mapper=NULL, CacheInterface $cache=NULL){
+	public function __construct($name, HydratorInterface $hydr=NULL, Mapper $mapper=NULL, CacheInterface $cache=NULL){
 		$this->setName($name);
 		if($mapper) $this->setMapper($mapper);
 		if($hydr) $this->setHydrator($hydr);
@@ -77,15 +77,19 @@ class Repository{
 		return $this->getName();
 	}
 	
-	public function setMapper(MapperInterface $mapper){
+	public function setMapper(Mapper $mapper){
 		$this->mapper=$mapper;
 		$this->mapper->setRepository($this);
 	}
 	/**
-	@return MapperInterface
+	@return Mapper
 	*/
 	public function getMapper(){
 		return $this->mapper;
+	}
+	
+	public function removeMapper(){
+		$this->mapper=NULL;
 	}
 	
 	public function setHydrator(HydratorInterface $hydr){
@@ -263,16 +267,15 @@ class Repository{
 			return;
 		}
 		$res=$this->mapper->find($filter,$limit,$not_in_ids);
-		$es=array();
+		/*$es=array();
 		foreach($res as $data){
 			$es[]=$this->hydrator->createFrom($data);
+		}*/
+		if($res){
+			$this->addAllToStore($res);
 		}
 		
-		if($es){
-			$this->addAllToStore($es);
-		}
-		
-		return $es;
+		return $res;
 	}
 	/**
 	Looks for entities in cache.
@@ -289,16 +292,12 @@ class Repository{
 			return;
 		}
 		$res=$this->cache->find($filter,$limit,$not_in_ids);
-		$es=array();
-		foreach($res as $data){
-			$es[]=$this->hydrator->createFrom($data);
+		
+		if($res){
+			$this->addAllToStore($res);
 		}
 		
-		if($es){
-			$this->addAllToStore($es);
-		}
-		
-		return $es;
+		return $res;
 	}
 	/**
 	Untracks entity object.
