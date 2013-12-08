@@ -161,7 +161,7 @@ class Repository{
 		then look in cache, givin $not_in_ids to it, add resulting Entities' IDs to that array,
 		and finaly look for entities in DB through mapper
 		*/
-		$found=$this->findStored($filter, $limit);
+		$found=$this->findStored(array(), $filter, $limit);
 		if($res=$is_enough($found)) return $res;
 		unset($res);
 		
