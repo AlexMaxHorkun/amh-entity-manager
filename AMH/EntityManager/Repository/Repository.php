@@ -187,17 +187,17 @@ class Repository{
 		
 		//Work with cache similar to mapper
 		if($this->cache){
-			$found=array_merge($found, $this->findInCache($filter,$limit,$extractIds()));
+			$found=array_merge($found, $this->findWithMapper($this->cache,$filter,$limit,$extractIds()));
 		}
 		
 		if($res=$isEnough()) return $res;
 		
 		//Working with mapper
 		if(!$this->mapper){
-			throw new \RuntimeException('Cannot find entities without mapper');
+			throw new \RuntimeException('Cannot find entities without DB mapper');
 			return NULL;
 		}
-		$found=array_merge($found, $this->findInDB($filter,$limit,$extractIds()));	
+		$found=array_merge($found, $this->findWithMapper($this->mapper,$filter,$limit,$extractIds()));	
 			
 		if($res=$isEnough()) return $res;
 		return $found;
@@ -260,42 +260,26 @@ class Repository{
 		$this->entities=array();
 	}
 	/**
-	Looks for entities in db.
+	Looks for entities in db or cache.
 	
+	@param Mapper|null If not given will use db mapper.
 	@param array $filter Criteria.
 	@param int $limit
 	@param array of (int)IDs not to look for.
 	
 	@return array of AbstractEntity.
 	*/
-	private function findInDB(array $filter=array(), $limit=0, array $not_in_ids=array()){
-		if(!$this->mapper){
-			throw new \RuntimeException("Mapper need's to be set");
-			return;
+	private function findWithMapper(Mapper $mapper=NULL, array $filter=array(), $limit=0, array $not_in_ids=array()){
+		if(!$mapper){
+			if($this->mapper){
+				$mapper=$this->mapper;
+			}
+			else{
+				throw new \RuntimeException("Mapper need's to be set");
+				return;
+			}
 		}
-		$res=$this->mapper->find($filter,$limit,$not_in_ids);
-		if($res){
-			$this->addAllToStore($res);
-		}
-		
-		return $res;
-	}
-	/**
-	Looks for entities in cache.
-	
-	@param array $filter Criteria.
-	@param int $limit
-	@param array of (int)IDs not to look for.
-	
-	@return array of AbstractEntity.
-	*/
-	private function findInCache(array $filter=array(), $limit=0, array $not_in_ids=array()){
-		if(!$this->cache){
-			throw new \RuntimeException("Mapper need's to be set");
-			return;
-		}
-		$res=$this->cache->find($filter,$limit,$not_in_ids);
-		
+		$res=$mapper->find($filter,$limit,$not_in_ids);
 		if($res){
 			$this->addAllToStore($res);
 		}
