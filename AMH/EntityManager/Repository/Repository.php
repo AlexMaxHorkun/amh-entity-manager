@@ -259,14 +259,50 @@ class Repository{
 		return array();
 	}
 	/**
+	@param AbstractEntity
+	
+	@return int Index or -1 if not found.
+	*/
+	protected isEntityStored(AbstractEntity $e){
+		foreach($this->entities as $key=>$data){
+			if($data['entity']===$e){
+				return $key;
+			}
+		}
+		
+		return -1;
+	}
+	/**
 	Adds entity to object's storage.
 	
 	@param AbstractEntity $e Entity.
 	@param int Flush action.
-	*/
-	//TODO
-	protected function addToStore(AbstractEntity $e, $f_action=self::FLUSH_ACTION_NONE){
 	
+	@throws \InvalidArgumentException if wrong Flush Action given.
+	
+	@return bool True if saved, FALSE if entity is already saved.
+	*/
+	protected function addToStore(AbstractEntity $e, $f_action=self::FLUSH_ACTION_NONE){
+		if(!$this->isEntityStore($e)){
+			switch($f_action){
+			case self::FLUSH_ACTION_NONE:
+			case self::FLUSH_ACTION_INSERT:
+			case self::FLUSH_ACTION_UPDATE:
+			case self::FLUSH_ACTION_REMVOE:
+				$this->entities[]=array(
+					'entity'=>$e,
+					'action'=>(int)$f_action
+				);
+				break;
+			default:
+				throw new \InvalidArgumentException('Invalid flush action given');
+				break;
+			}
+			
+			return TRUE;
+		}
+		
+		return FALSE;
 	}
 	/**
 	Adds multiple entities to object's storage.
