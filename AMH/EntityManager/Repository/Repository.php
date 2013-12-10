@@ -148,6 +148,27 @@ class Repository{
 		}
 	}
 	/**
+	Finds entities by IDs.
+	
+	@param array of IDs.
+	
+	@return array of Entity.
+	*/
+	public function findByIds(array $ids){
+		$filter=array('__id'=>array());
+		foreach($ids as $id){
+			if((int)$id>0){
+				$filter['__id'][]=(int)$id;
+			}
+			else{
+				throw new \InvalidArgumentException('First argument must containt only ids (ints > 0)');
+				return;
+			}
+		}
+		
+		return $this->findBy($filter);
+	}
+	/**
 	Finds Entities by criteria.
 	
 	@return array|null of AbstractEntity.
