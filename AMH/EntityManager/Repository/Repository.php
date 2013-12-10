@@ -252,11 +252,42 @@ class Repository{
 	@param array $filter Criteria.
 	@param int $limit
 	
-	@return array of (int)IDs
+	@return array of (int)IDs.
+	
+	@throws \RuntimeException If no hydrator set.
+	@throws \RuntimeException If filter has key which extrated entity hasn't.
 	*/
-	//TODO
 	protected function findStored(array $filter=array(), $limit=0){
-		return array();
+		if(!$this->hydrator){
+			throw new \RuntimeException('Hydrator must be set to filter stored entities');
+			return;
+		}
+		
+		$found=array();
+		foreach($this->entities as $e){
+			$e_data=$this->hydrator->extract($e);
+			foreach($filter as $field=>$val){
+				$fits=TRUE;
+				if(isset($e_data[$field])){
+					if(is_object($val) && ($val instanceof AbstractEntity)){
+						$val=$val->id();
+					}
+					//using STRICT comparation, might change this later
+					if($e_data[$field] !== $val){
+						$fits=FALSE;
+					}
+				}
+				else{
+					throw new \RuntimeException('Cannot find field "'.$field.'" in extracted by '.get_class($this->hydrator).' entity');
+				}
+				
+				if($fits){
+					$found[]=$e;
+				}
+			}
+		}
+		
+		return $found;
 	}
 	/**
 	@param AbstractEntity
