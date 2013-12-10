@@ -136,11 +136,16 @@ class Repository{
 	
 	@return AbstractEntity
 	*/
-	//TODO
 	public function find($id){
 		$id=(int)$id;
 		if($id){
-			
+			$e=$this->findByIds(array((int)$id));
+			if($e){
+				return $e[0];
+			}
+			else{
+				return NULL;
+			}
 		}
 		else{
 			throw new \InvalidArgumentException('ID must be an integer greater then zero');
