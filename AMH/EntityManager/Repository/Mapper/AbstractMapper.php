@@ -85,11 +85,21 @@ abstract class MapperInterface{
 	*/
 	abstract protected function findEntitiesInitData($filter=array(), $limit=0, $not_in_ids=array());
 	/**
-	@param array $ids Of IDs.
+	@param Entity
+	
+	@return void
+	*/
+	public function load(Entity $e){
+		$this->hydrator->fetchEntity($e, $this->loadEntityData($e->id()));
+	}
+	/**
+	Loads entity data (except for id and relative entities ids).
+	
+	@param int ID.
 	
 	@return array of data for hydrator.
 	*/
-	abstract public function load(array $ids);
+	protected function loadEntityData($id);
 	/**
 	@return void
 	*/
