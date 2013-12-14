@@ -6,6 +6,8 @@ use AMH\EntityManager\Repository\Mapper\AbstractMapper as Mapper;
 use AMH\EntityManager\Cache\AbstractCache as Cache;
 use AMH\EntityManager\EntityManager;
 use AMH\EntityManager\Entity\Hydrator\AbstractHydrator as Hydrator;
+use AMH\EntityManager\Repository\Mapper\SelectStatement as SelectStatement;
+use AMH\EntityManager\Repository\IdentityMap as IdentityMap;
 
 /**
 @author Alex horkun mindkilleralexs@gmail.com
@@ -19,9 +21,9 @@ class Repository{
 	const FLUSH_ACTION_REMVOE=3;
 	
 	/**
-	@var array of Entities and flush action information.
+	@var IdentityMap
 	*/
-	protected $entities=array();
+	protected $identity_map;
 	/**
 	@var string
 	*/
@@ -45,11 +47,12 @@ class Repository{
 	/**
 	@param string Classname of entities.
 	*/
-	public function __construct($name, Hydrator $hydr=NULL, Mapper $mapper=NULL, Cache $cache=NULL){
+	public function __construct($name, Hydrator $hydr=NULL, Mapper $mapper=NULL, Cache $cache=NULL, IdentityMap $map=NULL){
 		$this->setName($name);
 		if($mapper) $this->setMapper($mapper);
 		if($hydr) $this->setHydrator($hydr);
 		if($cache) $this->setCache($cache);
+		$this->setIdentityMap($map);
 	}
 	/**
 	@param string Classname of entities.
@@ -132,6 +135,33 @@ class Repository{
 		return $this->em;
 	}
 	/**
+	Sets identity map, If NULL given creates one by default.
+	
+	@param IdentityMap|null
+	
+	@throws \RuntimeException If no hydrator presented.
+	*/
+	public function setIdentityMap(IdentityMap $m=NULL){
+		if(!$m){
+			if($this->hydrator){
+				$m=new IdentityMap($this,$this->hydrator);
+			}
+			else{
+				throw new \RuntimeException('Cannot create default IdentityMap without hydrator');
+			}
+		}
+		else{
+			$m->setRepository($this);
+		}
+		$this->identity_map=$m;
+	}
+	/**
+	@return IdentityMap
+	*/
+	public function getIdentityMap(){
+		return $this->identity_map;
+	}
+	/**
 	Finds Entity by ID.
 	
 	@return AbstractEntity
@@ -139,7 +169,9 @@ class Repository{
 	public function find($id){
 		$id=(int)$id;
 		if($id){
-			$e=$this->findByIds(array((int)$id));
+			$ss=new SelectStatement();
+			$ss->setIds($id);
+			$e=$this->findBy($ss);
 			if($e){
 				return $e[0];
 			}
@@ -153,49 +185,20 @@ class Repository{
 		}
 	}
 	/**
-	Finds entities by IDs.
-	
-	@param array of IDs.
-	
-	@return array of Entity.
-	*/
-	public function findByIds(array $ids){
-		$filter=array('__id'=>array());
-		foreach($ids as $id){
-			if((int)$id>0){
-				$filter['__id'][]=(int)$id;
-			}
-			else{
-				throw new \InvalidArgumentException('First argument must containt only ids (ints > 0)');
-				return;
-			}
-		}
-		
-		return $this->findBy($filter);
-	}
-	/**
 	Finds Entities by criteria.
 	
 	@return array|null of AbstractEntity.
 	
 	@throws \RuntimeException.
 	*/
-	public function findBy(array $filter=array(), $limit=0){
-		/*forst look in entities prop, add resulting Entities' IDs to an array,
+	public function findBy(SelectStatement $select){
+		/*forst look in identity map, add resulting Entities' IDs to an array,
 		then look in cache, givin $not_in_ids to it, add resulting Entities' IDs to that array,
 		and finaly look for entities in DB through mapper
 		*/
+		$limit=$select->getLimit();
 		if($limit<0) $limit=0;
 		$found=array();//Entities found
-		
-		$isEnough=function() use($found,$limit){
-			if(!$limit) return FALSE;
-			if(count($items)>$limit)
-				return array_slice($items,0,$limit);
-			elseif($count($items)==$limit)
-				return $items;
-			else return FALSE;
-		};
 		
 		$extractIds=function() use($found){
 			$ids=array();
@@ -206,35 +209,46 @@ class Repository{
 			return $ids;
 		};
 		
-		$found=$this->findStored($filter, $limit);
-		
-		if($res=$isEnough()) return $res;
-		unset($res);
-		
-		//Work with cache similar to mapper
-		if($this->cache){
-			$found=array_merge($found, $this->findWithMapper($this->cache,$filter,$limit,$extractIds()));
+		if(!$this->identity_map){
+			throw \RuntimeException('IdentityMap is not set');
+		}
+		$found=$this->findWithMapper($this->identity_map,$select);
+		if($limit && count($found >= $limit)){
+			return array_slice($found, 0 ,$limit);
 		}
 		
-		if($res=$isEnough()) return $res;
+		$select->setNotInIds($extractIds());
+		//Work with cache similar to mapper
+		if($this->cache){
+			$found=array_merge($found, $this->findWithMapper($this->cache, $select));
+			$select->setNotInIds($extractIds());
+		}		
+		if($limit && count($found >= $limit)){
+			return array_slice($found, 0 ,$limit);
+		}
 		
 		//Working with mapper
 		if(!$this->mapper){
 			throw new \RuntimeException('Cannot find entities without DB mapper');
 			return NULL;
 		}
-		$found=array_merge($found, $this->findWithMapper($this->mapper,$filter,$limit,$extractIds()));	
+		$found=array_merge($found, $this->findWithMapper($this->mapper,$select);	
 			
-		if($res=$isEnough()) return $res;
-		return $found;
+		if($limit && count($found >= $limit)){
+			return array_slice($found, 0 ,$limit);
+		}
+		else{
+			return $found;
+		}
 	}
 	/**
 	Finds one entity by criteria.
 	
 	@return AbstractEntity|null
 	*/
-	public function findOneBy(array $filter=array()){
-		$res=$this->findBy($filter,1);
+	public function findOneBy(SelectStatement $s){
+		$s->setLimit(1);
+		$res=$this->findBy($s);
 		
 		if($res) return $res[0];
 		
@@ -244,56 +258,14 @@ class Repository{
 	@return array of AbstractEntity.
 	*/
 	public function findAll(){
-		return $this->findBy();
-	}
-	/**
-	Looks for entities stored in prop.
-	
-	@param array $filter Criteria.
-	@param int $limit
-	
-	@return array of (int)IDs.
-	
-	@throws \RuntimeException If no hydrator set.
-	@throws \RuntimeException If filter has key which extrated entity hasn't.
-	*/
-	protected function findStored(array $filter=array(), $limit=0){
-		if(!$this->hydrator){
-			throw new \RuntimeException('Hydrator must be set to filter stored entities');
-			return;
-		}
-		
-		$found=array();
-		foreach($this->entities as $e){
-			$e_data=$this->hydrator->extract($e);
-			foreach($filter as $field=>$val){
-				$fits=TRUE;
-				if(isset($e_data[$field])){
-					if(is_object($val) && ($val instanceof AbstractEntity)){
-						$val=$val->id();
-					}
-					//using STRICT comparation, might change this later
-					if($e_data[$field] !== $val){
-						$fits=FALSE;
-					}
-				}
-				else{
-					throw new \RuntimeException('Cannot find field "'.$field.'" in extracted by '.get_class($this->hydrator).' entity');
-				}
-				
-				if($fits){
-					$found[]=$e;
-				}
-			}
-		}
-		
-		return $found;
+		return $this->findBy(new SelectStatement());
 	}
 	/**
 	@param AbstractEntity
 	
 	@return int Index or -1 if not found.
 	*/
+	//TODO
 	protected isEntityStored(AbstractEntity $e){
 		foreach($this->entities as $key=>$data){
 			if($data['entity']===$e){
@@ -313,6 +285,7 @@ class Repository{
 	
 	@return bool True if saved, FALSE if entity is already saved.
 	*/
+	//TODO Move to IdentityMap
 	protected function addToStore(AbstractEntity $e, $f_action=self::FLUSH_ACTION_NONE){
 		if(!$this->isEntityStore($e)){
 			switch($f_action){
@@ -341,6 +314,7 @@ class Repository{
 	@param array $es Of AbstractEntity.
 	@param int $f_action Flush action for all entities.
 	*/
+	//TODO Move to IdentityMap
 	protected function addAllToStore(array $es, $f_action=self::FLUSH_ACTION_NONE){
 		foreach($es as $e){
 			$this->addToStore($e,$f_action);
@@ -349,6 +323,7 @@ class Repository{
 	/**
 	Clears stored entities.
 	*/
+	//TODO Move to IdentityMap
 	protected function clearStored(){
 		$this->entities=array();
 	}
@@ -362,7 +337,8 @@ class Repository{
 	
 	@return array of AbstractEntity.
 	*/
-	private function findWithMapper(Mapper $mapper=NULL, array $filter=array(), $limit=0, array $not_in_ids=array()){
+	//TODO Change according to IdentityMap
+	private function findWithMapper(Mapper $mapper=NULL, SelectStatement $select){
 		if(!$mapper){
 			if($this->mapper){
 				$mapper=$this->mapper;
@@ -372,7 +348,7 @@ class Repository{
 				return;
 			}
 		}
-		$res=$mapper->find($filter,$limit,$not_in_ids);
+		$res=$mapper->find($select);
 		if($res){
 			$this->addAllToStore($res);
 		}

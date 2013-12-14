@@ -4,7 +4,7 @@ namespace AMH\EntityManager\Repository\Mapper;
 use \AMH\EntityManager\Entity\AbstractEntity as Entity;
 use AMH\EntityManager\Repository\Repository;
 use AMH\EntityManager\Entity\Hydrator\AbstractHydrator as Hydrator;
-use SelectStatement as SelSttm;
+use AMH\EntityManager\Repository\Mapper\SelectStatement as SelSttm;
 
 /**
 @author Alex Horkun
