@@ -258,27 +258,22 @@ class Repository{
 	/**
 	Looks for entities in db or cache.
 	
-	@param Mapper|null If not given will use db mapper.
+	@param Mapper|null If not given will uses identity map.
 	@param array $filter Criteria.
 	@param int $limit
 	@param array of (int)IDs not to look for.
 	
 	@return array of AbstractEntity.
 	*/
-	//TODO Change according to IdentityMap
 	private function findWithMapper(Mapper $mapper=NULL, SelectStatement $select){
 		if(!$mapper){
 			if($this->mapper){
-				$mapper=$this->mapper;
-			}
-			else{
-				throw new \RuntimeException("Mapper need's to be set");
-				return;
+				$mapper=$this->identity_map;
 			}
 		}
 		$res=$mapper->find($select);
-		if($res){
-			$this->addAllToStore($res);
+		if($res && $mapper!=$this->identity_map){
+			$this->identity_map->addAllToMap($res);
 		}
 		
 		return $res;
