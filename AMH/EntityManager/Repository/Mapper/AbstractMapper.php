@@ -4,6 +4,7 @@ namespace AMH\EntityManager\Repository\Mapper;
 use \AMH\EntityManager\Entity\AbstractEntity as Entity;
 use AMH\EntityManager\Repository\Repository;
 use AMH\EntityManager\Entity\Hydrator\AbstractHydrator as Hydrator;
+use SelectStatement as SelSttm;
 
 /**
 @author Alex Horkun
@@ -35,10 +36,13 @@ abstract class MapperInterface{
 	
 	@return array of Entity.
 	*/
-	public function find($filter=array(), $limit=0, $not_in_ids=array()){
-		$data=$this->findEntitiesInitData($filter, $limit, $not_in_ids);
+	public function find(SelSttm $s){
+		$data=$this->findEntities($s);
 		if($data){
-			return $this->createEntities($data);
+			$es=array();
+			foreach($data as $e){
+				$es[]=$this->hydrator->createFrom($data);
+			}
 		}
 		else{
 			return array();
@@ -83,14 +87,14 @@ abstract class MapperInterface{
 	
 	@return array of (int)IDS and relative entities IDs.
 	*/
-	abstract protected function findEntitiesInitData($filter=array(), $limit=0, $not_in_ids=array());
+	abstract protected function findEntities(SelSttm $s);
 	/**
 	@param Entity
 	
 	@return void
 	*/
 	public function load(Entity $e){
-		$this->hydrator->fetchEntity($e, $this->loadEntityData($e->id()));
+		$this->hydrator->hydrate($e, $this->loadEntityData($e->id()));
 	}
 	/**
 	Loads entity data (except for id and relative entities ids).

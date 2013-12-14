@@ -64,13 +64,12 @@ abstract class AbstractHydrator{
 	*/
 	abstract public function createFrom(array $data);
 	/**
-	Fetches entity data (fields which are not ID or relative entities' IDs).
-	
 	@param Entity
+	@param array Data.
 	
 	@return void
 	*/
-	abstract public function fetchEntity(Entity $e);
+	abstract public function hydrate(Entity $e, array $data);
 	/**
 	Extracts entity to array, relative entities must be return as ids not objects.
 	

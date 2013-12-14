@@ -3,7 +3,7 @@ namespace AMH\EntityManager\Repository;
 
 use AMH\EntityManager\Entity\AbstractEntity;
 use AMH\EntityManager\Repository\Mapper\AbstractMapper as Mapper;
-use AMH\EntityManager\Cache\CacheInterface;
+use AMH\EntityManager\Cache\AbstractCache as Cache;
 use AMH\EntityManager\EntityManager;
 use AMH\EntityManager\Entity\Hydrator\AbstractHydrator as Hydrator;
 
@@ -45,7 +45,7 @@ class Repository{
 	/**
 	@param string Classname of entities.
 	*/
-	public function __construct($name, Hydrator $hydr=NULL, Mapper $mapper=NULL, CacheInterface $cache=NULL){
+	public function __construct($name, Hydrator $hydr=NULL, Mapper $mapper=NULL, Cache $cache=NULL){
 		$this->setName($name);
 		if($mapper) $this->setMapper($mapper);
 		if($hydr) $this->setHydrator($hydr);
@@ -109,11 +109,11 @@ class Repository{
 		return $this->hydrator;
 	}
 	
-	public function setCache(CacheInterface $cache){
+	public function setCache(Cache $cache){
 		$this->cache=$cache;
 	}
 	/**
-	@return CacheInterface
+	@return Cache
 	*/
 	public function getCache(){
 		return $this->cache;

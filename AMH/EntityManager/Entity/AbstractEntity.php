@@ -12,7 +12,7 @@ abstract class AbstractEntity{
 	/**
 	@var int DB ID.
 	*/
-	private $id=NULL;
+	protected $id=NULL;
 	/**
 	@var Repository
 	*/
@@ -31,7 +31,7 @@ abstract class AbstractEntity{
 	protected function load(){
 		if(!$this->isLoaded()){
 			if($this->id){
-				$this->repo->loadOne($this);
+				$this->repo->load($this);
 				$this->loaded=TRUE;
 			}
 			else{
