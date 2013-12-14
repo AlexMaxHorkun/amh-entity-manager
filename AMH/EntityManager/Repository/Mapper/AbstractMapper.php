@@ -103,7 +103,7 @@ abstract class MapperInterface{
 	
 	@return array of data for hydrator.
 	*/
-	protected function loadEntityData($id);
+	abstract protected function loadEntityData($id);
 	/**
 	@return void
 	*/

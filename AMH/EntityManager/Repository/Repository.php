@@ -373,7 +373,7 @@ class Repository{
 	Loads entity.
 	*/
 	//TODO
-	public function loadOne(AbstractEntity $e){
+	public function load(AbstractEntity $e){
 		
 	}
 	/**
