@@ -15,11 +15,6 @@ use AMH\EntityManager\Repository\IdentityMap as IdentityMap;
 Repository is used to work with Mapper and to store entitties in memory and cache.
 */
 class Repository{
-	const FLUSH_ACTION_NONE=0;
-	const FLUSH_ACTION_INSERT=1;
-	const FLUSH_ACTION_UPDATE=2;
-	const FLUSH_ACTION_REMVOE=3;
-	
 	/**
 	@var IdentityMap
 	*/
@@ -259,73 +254,6 @@ class Repository{
 	*/
 	public function findAll(){
 		return $this->findBy(new SelectStatement());
-	}
-	/**
-	@param AbstractEntity
-	
-	@return int Index or -1 if not found.
-	*/
-	//TODO
-	protected isEntityStored(AbstractEntity $e){
-		foreach($this->entities as $key=>$data){
-			if($data['entity']===$e){
-				return $key;
-			}
-		}
-		
-		return -1;
-	}
-	/**
-	Adds entity to object's storage.
-	
-	@param AbstractEntity $e Entity.
-	@param int Flush action.
-	
-	@throws \InvalidArgumentException if wrong Flush Action given.
-	
-	@return bool True if saved, FALSE if entity is already saved.
-	*/
-	//TODO Move to IdentityMap
-	protected function addToStore(AbstractEntity $e, $f_action=self::FLUSH_ACTION_NONE){
-		if(!$this->isEntityStore($e)){
-			switch($f_action){
-			case self::FLUSH_ACTION_NONE:
-			case self::FLUSH_ACTION_INSERT:
-			case self::FLUSH_ACTION_UPDATE:
-			case self::FLUSH_ACTION_REMVOE:
-				$this->entities[]=array(
-					'entity'=>$e,
-					'action'=>(int)$f_action
-				);
-				break;
-			default:
-				throw new \InvalidArgumentException('Invalid flush action given');
-				break;
-			}
-			
-			return TRUE;
-		}
-		
-		return FALSE;
-	}
-	/**
-	Adds multiple entities to object's storage.
-	
-	@param array $es Of AbstractEntity.
-	@param int $f_action Flush action for all entities.
-	*/
-	//TODO Move to IdentityMap
-	protected function addAllToStore(array $es, $f_action=self::FLUSH_ACTION_NONE){
-		foreach($es as $e){
-			$this->addToStore($e,$f_action);
-		}
-	}
-	/**
-	Clears stored entities.
-	*/
-	//TODO Move to IdentityMap
-	protected function clearStored(){
-		$this->entities=array();
 	}
 	/**
 	Looks for entities in db or cache.
