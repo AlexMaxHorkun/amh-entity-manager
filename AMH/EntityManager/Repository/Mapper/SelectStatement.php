@@ -8,6 +8,10 @@ Holds select params.
 */
 class SelectStatement{
 	/**
+	@var array Of int IDs needed.
+	*/
+	protected $ids=array();
+	/**
 	@var array Of property=value.
 	*/
 	protected $filter=array();
@@ -31,10 +35,11 @@ class SelectStatement{
 	@param array $order_by of prop=>asc/desc.
 	@param array $not_in_ids of int IDs of entities not needed.
 	*/
-	public function __construct(array $filter=array(),$limit=0,array $order_by=array(),array $not_in_ids=array()){
+	public function __construct(array $filter=array(),$limit=0,array $order_by=array(),$ids=array(),array $not_in_ids=array()){
 		$this->setFilter($filter);
 		$this->setLimit($limit);
 		$this->setOrderBy($order_by);
+		$this->setIds($ids);
 		$this->setNotInIds($not_in_ids);
 	}
 	/**
@@ -94,6 +99,28 @@ class SelectStatement{
 	*/
 	public function getNotInIds(){
 		return $this->not_in_ids;
+	}
+	/**
+	@param int|array IDs or ID of entities needed.
+	*/
+	public function setIds($ids=array()){
+		if(!is_array($ids)){
+			$ids=array($ids);
+		}
+		
+		foreach($ids as $id){
+			if((int)$id<=0){
+				throw new \InvalidArgumentException('Invalid argument given to '.get_class($this).'::'.__FUNCTION__.' must containt only ints greater then zero, invalid value "'.$id.'" found');
+			}
+		}
+		
+		$this->ids=$ids;
+	}
+	/**
+	@return array Of int IDs.
+	*/
+	public function getIds(){
+		return $ids;
 	}
 }
 ?>
