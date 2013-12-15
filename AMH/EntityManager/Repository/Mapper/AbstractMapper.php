@@ -102,7 +102,7 @@ abstract class AbstractMapper{
 		}
 	}
 	/**
-	Loads entity data (except for id and relative entities ids).
+	Loads entity data.
 	
 	@param int ID.
 	
