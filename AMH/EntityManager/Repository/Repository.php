@@ -281,30 +281,42 @@ class Repository{
 	/**
 	Untracks entity object.
 	*/
-	//TODO
 	public function untrack(AbstractEntity $e){
-	
+		$this->identity_map->remove($e);
 	}
 	/**
 	Marks an entity as dirty.
 	*/
-	//TODO
 	public function dirty(AbstractEntity $e){
-	
+		$this->identity_map->dirty($e);
 	}
 	/**
 	Loads entity.
+	
+	@return bool If loaded successfuly.
+	
+	@throws \RuntimeException If no mapper given.
 	*/
-	//TODO
 	public function load(AbstractEntity $e){
-		
+		if(!$this->isLoaded($e)){
+			$loaded=FALSE;
+			if($this->cache){
+				$loaded=$this->cache->load($e);
+			}
+			if(!$loaded){
+				if(!$this->mapper){
+					throw \RuntimeException('Cannot load entity without db mapper.');
+				}
+				$loaded=$this->mapper->load($e);
+			}
+			return $loaded;
+		}
 	}
 	/**
 	@return bool
 	*/
-	//TODO
 	public function isLoaded(AbstractEntity $e){
-	
+		return $this->identity_map->isEntityLoaded($e);
 	}
 }
 ?>

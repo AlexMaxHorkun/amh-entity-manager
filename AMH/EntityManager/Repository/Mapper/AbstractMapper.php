@@ -91,17 +91,24 @@ abstract class MapperInterface{
 	/**
 	@param Entity
 	
-	@return void
+	@return bool TRUE if entity data found.
 	*/
 	public function load(Entity $e){
-		$this->hydrator->hydrate($e, $this->loadEntityData($e->id()));
+		$data=$this->loadEntityData($e->id());
+		if($data){
+			$this->hydrator->hydrate($e, $data);
+			return TRUE;
+		}
+		else{
+			return FALSE;
+		}
 	}
 	/**
 	Loads entity data (except for id and relative entities ids).
 	
 	@param int ID.
 	
-	@return array of data for hydrator.
+	@return array|null of data for hydrator, or null if no data available.
 	*/
 	abstract protected function loadEntityData($id);
 	/**

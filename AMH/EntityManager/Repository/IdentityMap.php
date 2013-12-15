@@ -81,7 +81,8 @@ class IdentityMap extends Mapper{
 			case self::FLUSH_ACTION_REMVOE:
 				$this->entities[]=array(
 					'entity'=>$e,
-					'action'=>(int)$f_action
+					'action'=>(int)$f_action,
+					'loaded'=>TRUE,
 				);
 				break;
 			default:
@@ -104,6 +105,20 @@ class IdentityMap extends Mapper{
 		foreach($es as $e){
 			$this->addToStore($e,$f_action);
 		}
+	}
+	/**
+	Checks if entity was loaded.
+	
+	@param Entity
+	
+	@return bool
+	*/
+	public function isEntityLoaded(Entity $e){
+		$ind=$this->has($e);
+		if($ind>=0 && $this->entities[$ind]['loaded'])
+			return TRUE;
+					
+		return FALSE;
 	}
 }
 ?>
