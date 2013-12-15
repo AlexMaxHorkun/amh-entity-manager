@@ -24,6 +24,12 @@ abstract class AbstractEntity{
 		return $this->id;
 	}
 	/**
+	@param int
+	*/
+	public function setId($id){
+		$this->id=(int)$id;
+	}
+	/**
 	Loads entity from DB.
 	
 	@throws \RuntimeException If ID's undefined.
