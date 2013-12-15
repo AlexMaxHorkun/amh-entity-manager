@@ -11,7 +11,7 @@ use AMH\EntityManager\Repository\Mapper\SelectStatement as SelSttm;
 
 Interface to communicate with db, only CRUD methods.
 */
-abstract class MapperInterface{
+abstract class AbstractMapper{
 	/**
 	@var Repository
 	*/
