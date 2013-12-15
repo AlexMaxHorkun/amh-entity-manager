@@ -14,7 +14,7 @@ class IdentityMap extends Mapper{
 	const FLUSH_ACTION_NONE=0;
 	const FLUSH_ACTION_INSERT=1;
 	const FLUSH_ACTION_UPDATE=2;
-	const FLUSH_ACTION_REMVOE=3;
+	const FLUSH_ACTION_REMOVE=3;
 	
 	/**
 	@var array Of Entities, their flush action and loaded attribute.
@@ -47,15 +47,24 @@ class IdentityMap extends Mapper{
 	
 	protected function update(Entity $e){}
 	
-	protected function remove(Entity $e){}
+	protected function remove($e){
+		if(($ind=$this->has($e))>=0){
+			unset($this->entities[$ind]);
+		}
+	}
 	/**
 	Checks if entity is stored.
 	
+	@param int|Entity Entity object or ID.
+	
 	@return int Idnex or -1 if not found.
 	*/
-	protected function has(Entity $e){
+	protected function has($e){
+		if(!($e instanceof Entity)){
+			$e=(int)$e;
+		}
 		foreach($this->entities as $key=>$data){
-			if($data['entity']===$e){
+			if((($e instanceof Entity) && $data['entity']===$e) || $e==$data['entity']->id()){
 				return $key;
 			}
 		}
@@ -73,12 +82,12 @@ class IdentityMap extends Mapper{
 	@return bool True if saved, FALSE if entity is already saved.
 	*/
 	protected function addToMap(AbstractEntity $e, $f_action=self::FLUSH_ACTION_NONE){
-		if(!$this->has($e)){
+		if($this->has($e) == -1){
 			switch($f_action){
 			case self::FLUSH_ACTION_NONE:
 			case self::FLUSH_ACTION_INSERT:
 			case self::FLUSH_ACTION_UPDATE:
-			case self::FLUSH_ACTION_REMVOE:
+			case self::FLUSH_ACTION_REMOVE:
 				$this->entities[]=array(
 					'entity'=>$e,
 					'action'=>(int)$f_action,
@@ -119,6 +128,39 @@ class IdentityMap extends Mapper{
 			return TRUE;
 					
 		return FALSE;
+	}
+	/**
+	Finds relative Entity, of not founds returns Entity obj only with ID.
+	
+	@param int ID.
+	
+	@return Entity
+	
+	@throws \RuntimeException
+	*/
+	public function findRelative($id){
+		$id=(int)$id;
+		if(($ind=$this->has($id))>=0){
+			return $this->entities[$ind]['entity'];
+		}
+		else{
+			if(!$this->getHydrator()){
+				throw \RuntimeException('No hydrator provided');
+			}
+			$e=$this->getHydrator()->create();
+			$e->setId($id);
+			return $e;
+		}
+	}
+	/**
+	Marks entity to be updated.
+	
+	@param int|Entity ID or Entity obj.
+	*/
+	public function dirty($e){
+		if(($int=$this->has($e))>=0){
+			$this->entities[$ind]['action']=self::FLUSH_ACTION_UPDATE;
+		}
 	}
 }
 ?>

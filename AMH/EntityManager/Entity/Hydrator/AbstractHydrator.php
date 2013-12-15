@@ -29,16 +29,22 @@ abstract class AbstractHydrator{
 	Gets relative entity.
 	
 	@param string Entity classname (repo name).
-	@param int ID of needed entity.
+	@param int ID.
 	
 	@return Entity.
+	
+	@throws \RuntimeException
 	*/
 	protected function relative($name, $id){
 		if($em=$this->repo->getEntityManager()){
-			return $em->find($name,$id);
+			$repo=$em->getRepository($name);
+			if(!$repo){
+				throw new \RuntimeException('Repository '.$name.' doesn\'t exist');
+			}
+			return $repo->relative($id);
 		}
 		else{
-			throw new \RuntimeException('Cannot find relative entity without link to Entitymanager');
+			throw new \RuntimeException('Cannot find relative entity without link to EntityManager');
 		}
 	}
 	/**
@@ -46,10 +52,14 @@ abstract class AbstractHydrator{
 	
 	@param string Entity classname (repo name).
 	@param array IDs.
+	
+	@return array of Entity.
+	
+	@throws \RuntimeException
 	*/
 	protected function relatives($name, array $ids){
 		if(($em=$this->repo->getEntityManager()) && ($repo=$em->getRepository($name))){
-			return $repo->findByIds($ids);
+			return $repo->relatives($ids);
 		}
 		else{
 			throw new \RuntimeException('Cannot find relative entity without link to Entitymanager');
@@ -62,7 +72,17 @@ abstract class AbstractHydrator{
 	
 	@return Entity
 	*/
-	abstract public function createFrom(array $data);
+	public function createFrom(array $data){
+		$e=$this->create();
+		$this->hydrate($e,$data);
+		return $e;
+	}
+	/**
+	Creates Entity.
+	
+	@return Entity
+	*/
+	abstract public function create();
 	/**
 	@param Entity
 	@param array Data.
