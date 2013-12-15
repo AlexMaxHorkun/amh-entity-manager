@@ -79,13 +79,11 @@ abstract class AbstractMapper{
 		return $es;
 	}
 	/**
-	Finds entities init data (id, relative entities ids).
+	Finds entities data.
 	
-	@param array $filter Criteria for records.
-	@limit int|null Maxim amount of entities to return.
-	@param array $not_in_ids of Entity IDs.
+	@param SelSttm
 	
-	@return array of (int)IDS and relative entities IDs.
+	@return array of Entities data.
 	*/
 	abstract protected function findEntities(SelSttm $s);
 	/**
