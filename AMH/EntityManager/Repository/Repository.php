@@ -230,7 +230,7 @@ class Repository{
 			throw new \RuntimeException('Cannot find entities without DB mapper');
 			return NULL;
 		}
-		$found=array_merge($found, $this->findWithMapper($this->mapper,$select));	
+		$found=array_merge($found, $this->findWithMapper($this->mapper,$select));
 			
 		if($limit && count($found >= $limit)){
 			return array_slice($found, 0 ,$limit);

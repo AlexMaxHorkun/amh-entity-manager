@@ -59,7 +59,7 @@ class IdentityMap extends Mapper{
 	
 	@return int Idnex or -1 if not found.
 	*/
-	protected function has($e){
+	public function has($e){
 		if(!($e instanceof Entity)){
 			$e=(int)$e;
 		}
@@ -74,14 +74,14 @@ class IdentityMap extends Mapper{
 	/**
 	Adds entity to object's storage.
 	
-	@param AbstractEntity $e Entity.
+	@param Entity $e Entity.
 	@param int Flush action.
 	
 	@throws \InvalidArgumentException if wrong Flush Action given.
 	
 	@return bool True if saved, FALSE if entity is already saved.
 	*/
-	protected function addToMap(AbstractEntity $e, $f_action=self::FLUSH_ACTION_NONE){
+	public function addToMap(Entity $e, $f_action=self::FLUSH_ACTION_NONE){
 		if($this->has($e) == -1){
 			switch($f_action){
 			case self::FLUSH_ACTION_NONE:
@@ -107,12 +107,12 @@ class IdentityMap extends Mapper{
 	/**
 	Adds multiple entities to object's storage.
 	
-	@param array $es Of AbstractEntity.
+	@param array $es Of Entity.
 	@param int $f_action Flush action for all entities.
 	*/
-	protected function addAllToMap(array $es, $f_action=self::FLUSH_ACTION_NONE){
+	public function addAllToMap(array $es, $f_action=self::FLUSH_ACTION_NONE){
 		foreach($es as $e){
-			$this->addToStore($e,$f_action);
+			$this->addToMap($e,$f_action);
 		}
 	}
 	/**
