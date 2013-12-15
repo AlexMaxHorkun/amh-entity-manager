@@ -24,7 +24,7 @@ class IdentityMap extends Mapper{
 	@return array of Entity.
 	*/
 	public function find(SelSttm $select){
-		return $this->findEtnities($select);
+		return $this->findEntities($select);
 	}
 	/**
 	@return array of Entity.
@@ -39,15 +39,15 @@ class IdentityMap extends Mapper{
 	
 	protected function loadEntityData($id){}
 	
-	protected function load(Entity $e){}
+	public function load(Entity $e){}
 	
-	protected function add(Entity $e){
+	public function add(Entity $e){
 		$this->addToMap($e);
 	}
 	
-	protected function update(Entity $e){}
+	public function update(Entity $e){}
 	
-	protected function remove($e){
+	public function remove(Entity $e){
 		if(($ind=$this->has($e))>=0){
 			unset($this->entities[$ind]);
 		}
