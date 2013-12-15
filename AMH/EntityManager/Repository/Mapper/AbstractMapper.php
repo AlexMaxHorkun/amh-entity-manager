@@ -41,7 +41,7 @@ abstract class AbstractMapper{
 		if($data){
 			$es=array();
 			foreach($data as $e){
-				$es[]=$this->hydrator->createFrom($data);
+				$es[]=$this->hydrator->createFrom($e);
 			}
 			
 			return $es;
