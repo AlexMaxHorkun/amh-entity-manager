@@ -137,5 +137,15 @@ class EntityManager{
 			return NULL;
 		}
 	}
+	/**
+	Saves changes done to entities.
+	
+	@return void
+	*/
+	public function flush(){
+		foreach($this->repos as $r){
+			$r->flush();
+		}
+	}	
 }
 ?>
