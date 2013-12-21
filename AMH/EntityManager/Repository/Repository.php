@@ -216,15 +216,21 @@ class Repository{
 		}
 		
 		$select->setNotInIds($extractIds());
+		if($select->getLimit()){
+			$select->setLimit($select->getLimit()-count($found));
+		}
 		//Work with cache similar to mapper
 		if($this->cache){
 			$found=array_merge($found, $this->findWithMapper($this->cache, $select));
 			$select->setNotInIds($extractIds());
+			if($limit && count($found >= $limit)){
+				return array_slice($found, 0 ,$limit);
+			}
+			if($select->getLimit()){
+				$select->setLimit($select->getLimit()-count($found));
+			}
 		}		
-		if($limit && count($found >= $limit)){
-			return array_slice($found, 0 ,$limit);
-		}
-		
+				
 		//Working with mapper
 		if(!$this->mapper){
 			throw new \RuntimeException('Cannot find entities without DB mapper');
