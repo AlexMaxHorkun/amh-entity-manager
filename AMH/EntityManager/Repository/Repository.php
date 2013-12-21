@@ -211,7 +211,7 @@ class Repository{
 			$this->setIdentityMap();
 		}
 		$found=$this->findWithMapper($this->identity_map,$select);
-		if($limit && count($found >= $limit)){
+		if($limit && count($found) >= $limit){
 			return array_slice($found, 0 ,$limit);
 		}
 		
@@ -223,7 +223,7 @@ class Repository{
 		if($this->cache){
 			$found=array_merge($found, $this->findWithMapper($this->cache, $select));
 			$select->setNotInIds($extractIds());
-			if($limit && count($found >= $limit)){
+			if($limit && count($found) >= $limit){
 				return array_slice($found, 0 ,$limit);
 			}
 			if($select->getLimit()){
@@ -238,7 +238,7 @@ class Repository{
 		}
 		$found=array_merge($found, $this->findWithMapper($this->mapper,$select));
 			
-		if($limit && count($found >= $limit)){
+		if($limit && count($found) >= $limit){
 			return array_slice($found, 0 ,$limit);
 		}
 		else{
