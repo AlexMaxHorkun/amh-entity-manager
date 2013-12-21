@@ -29,12 +29,22 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	/**
 	@return array of Entity.
 	*/
-	//TODO
 	protected function findEntities(SelSttm $select){
 		$found=array();
-		
-		
-		
+		foreach($this->entities as $e){
+			if(($ids=$select->getIds()) && !in_array($e->id(),$ids){
+				continue;
+			}
+			elseif(($ids=$select->getNotInIds) && in_array($e->id(),$ids)){
+				continue;
+			}
+			elseif(!($this->getHydrator()->fitsCriteria($e,$select))){
+				continue;
+			}
+			else{
+				$found[]=$e;
+			}
+		}	
 		return $found;
 	}
 	
