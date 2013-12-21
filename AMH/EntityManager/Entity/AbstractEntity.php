@@ -71,9 +71,6 @@ abstract class AbstractEntity{
 		if($this->repo){
 			$this->repo->dirty($this);
 		}
-		else{
-			throw new \RuntimeException(get_class($this).'::'.__FUNCTION__.' method requires a repository to be set');
-		}
 	}
 }
 ?>
