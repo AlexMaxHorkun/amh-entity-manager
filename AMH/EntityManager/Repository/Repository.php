@@ -367,5 +367,30 @@ class Repository{
 		}
 		return $es;
 	}
+	/**
+	Saves changes done to entities.
+	
+	@return void
+	*/
+	public function flush(){
+		if(!$this->identity_map){
+			throw new \RuntimeException('Can\'t do shit without identity map');
+		}
+		if(!$this->mapper){
+			throw new \RuntimeException('Can\'t do shit without mapper');
+		}
+		
+		$uow=$this->identity_map->unitOfWork();
+		foreach($uow['add'] as $e){
+			$this->mapper->add($e);
+		}
+		foreach($uow['update'] as $e){
+			$this->mapper->update($e);
+		}
+		foreach($uow['remove'] as $e){
+			$this->mapper->remove($e);
+			$this->identity_map->remove($e);
+		}
+	}
 }
 ?>
