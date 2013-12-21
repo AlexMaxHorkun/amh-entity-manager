@@ -168,5 +168,14 @@ class IdentityMap extends Mapper{
 			$this->entities[$ind]['action']=self::FLUSH_ACTION_UPDATE;
 		}
 	}
+	/**
+	@return int flush action
+	*/
+	public function flushAction(Entity $e){
+		if($ind=$this->has($e)=>0){
+			return $this->entities[$ind]['action'];
+		}
+		return FALSE;
+	}
 }
 ?>
