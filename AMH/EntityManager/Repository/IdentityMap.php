@@ -177,5 +177,33 @@ class IdentityMap extends Mapper{
 		}
 		return FALSE;
 	}
+	/**
+	@return array List of entities to add, update or remove.
+	*/
+	public function unitOfWork(){
+		$uow=array('add'=>array(), 'update'=>array(), 'remove'=>array());
+		foreach($this->entities as $e_data){
+			if($e_data['action']==self::FLUSH_ACTION_INSERT){
+				$uow['add'][]=$e_data['entity'];
+			}
+			elseif($e_data['action']==self::FLUSH_ACTION_UPDATE){
+				$uow['update'][]=$e_data['entity'];
+			}
+			elseif($e_data['action']==self::FLUSH_ACTION_REMOVE){
+				$uow['remove'][]=$e_data['entity'];
+			}
+		}
+		return $uow;
+	}
+	/**
+	Clears unit of work (sets acton param to NONE).
+	
+	@return void
+	*/
+	public function clearUnitOfWork(){
+		foreach($this->entities as $key=>$e_data){
+			$this->entities[$key]['action']=self::FLUSH_ACTION_NONE;
+		}
+	}
 }
 ?>
