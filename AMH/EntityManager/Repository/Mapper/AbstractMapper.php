@@ -21,7 +21,7 @@ abstract class AbstractMapper{
 	*/
 	private $hydrator=NULL;
 	
-	public function __counstruct(Repository $repo,Hydrator $hydr){
+	public function __construct(Repository $repo,Hydrator $hydr){
 		$this->setRepository($repo);
 		$this->setHydrator($hydr);
 	}
@@ -130,6 +130,7 @@ abstract class AbstractMapper{
 		if($this->repo){
 			$this->repo->removeMapper();
 		}
+		
 		$this->repo=$r;
 	}
 	/**
