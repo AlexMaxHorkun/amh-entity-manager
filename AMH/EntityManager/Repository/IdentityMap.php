@@ -10,7 +10,7 @@ Manages loaded from mappers entities.
 
 @author Alex Horkun mindkilleralexs@gmail.com
 */
-class IdentityMap extends Mapper{
+class IdentityMap extends Mapper implements \ArrayAccess{
 	const FLUSH_ACTION_NONE=0;
 	const FLUSH_ACTION_INSERT=1;
 	const FLUSH_ACTION_UPDATE=2;
@@ -29,6 +29,7 @@ class IdentityMap extends Mapper{
 	/**
 	@return array of Entity.
 	*/
+	//TODO
 	protected function findEntities(SelSttm $select){
 		$found=array();
 		
@@ -205,5 +206,23 @@ class IdentityMap extends Mapper{
 			$this->entities[$key]['action']=self::FLUSH_ACTION_NONE;
 		}
 	}
+	
+	//ArrayAccess
+	public function offsetExists($i){
+		return isset($this->entities[$i]);
+	}
+	
+	public function offsetGet($i){
+		if(isset($this->entities[$i])){
+			return $this->entities[$i]['entity'];
+		}
+		else{
+			throw new \RuntimeException(get_class($this).'::'.__FUNCTION__.' offset "'.$i.'" does not exisits');
+			return NULL;
+		}
+	}
+	
+	public function offsetSet($i,$val){}
+	public function offsetUnset($i){}
 }
 ?>
