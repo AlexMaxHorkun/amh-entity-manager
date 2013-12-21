@@ -72,7 +72,7 @@ abstract class AbstractEntity{
 			$this->repo->dirty($this);
 		}
 		else{
-			throw new \RuntimeException(__FUNCTION__.' method requires a repository to be set');
+			throw new \RuntimeException(get_class($this).'::'.__FUNCTION__.' method requires a repository to be set');
 		}
 	}
 }
