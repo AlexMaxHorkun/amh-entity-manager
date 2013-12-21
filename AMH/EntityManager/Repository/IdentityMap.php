@@ -64,7 +64,7 @@ class IdentityMap extends Mapper{
 			$e=(int)$e;
 		}
 		foreach($this->entities as $key=>$data){
-			if((($e instanceof Entity) && $data['entity']->id()==$e->id()) || $e==$data['entity']->id()){
+			if((($e instanceof Entity) && $data['entity']->id()==$e->id()) || (gettype($e)=='int' && $e==$data['entity']->id())){
 				return $key;
 			}
 		}
