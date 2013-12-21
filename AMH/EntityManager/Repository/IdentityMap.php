@@ -4,6 +4,7 @@ namespace AMH\EntityManager\Repository;
 use AMH\EntityManager\Repository\Mapper\AbstractMapper as Mapper;
 use AMH\EntityManager\Entity\AbstractEntity as Entity;
 use AMH\EntityManager\Repository\Mapper\SelectStatement as SelSttm;
+use AMH\EntityManager\Entity\Hydrator\AbstractHydrator as Hydrator;
 
 /**
 Manages loaded from mappers entities.
@@ -20,6 +21,10 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	@var array Of Entities, their flush action and loaded attribute.
 	*/
 	protected $entities=array();
+	
+	public function __construct(Repository $r, Hydrator $h){
+		parent::__construct($r,$h);
+	}
 	/**
 	@return array of Entity.
 	*/
@@ -32,13 +37,13 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	protected function findEntities(SelSttm $select){
 		$found=array();
 		foreach($this->entities as $e){
-			if(($ids=$select->getIds()) && !in_array($e->id(),$ids){
+			if(($ids=$select->getIds()) && !in_array($e->id(),$ids)){
 				continue;
 			}
-			elseif(($ids=$select->getNotInIds) && in_array($e->id(),$ids)){
+			elseif(($ids=$select->getNotInIds()) && in_array($e->id(),$ids)){
 				continue;
 			}
-			elseif(!($this->getHydrator()->fitsCriteria($e,$select))){
+			elseif(!($this->getHydrator()->fitsCriteria($e['entity'],$select))){
 				continue;
 			}
 			else{
