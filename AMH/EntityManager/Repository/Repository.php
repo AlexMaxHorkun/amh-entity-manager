@@ -283,10 +283,17 @@ class Repository{
 		}
 		$res=$mapper->find($select);
 		if($res && $mapper!=$this->identity_map){
-			foreach($res as $e){
-				$e->setRepository($this);
+			foreach($res as $key=>$e){
+				if($this->identity_map->addToMap($e)){
+					$e->setRepository($this);
+				}
+				elseif(($ind=$this->identity_map->has($e))!=-1){
+					$res[$key]=$this->identity_map[$ind];
+				}
+				else{
+					unset($res[$key]);
+				}
 			}
-			$this->identity_map->addAllToMap($res);
 		}
 		
 		return $res;
