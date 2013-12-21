@@ -42,13 +42,11 @@ class Repository{
 	/**
 	@param string Classname of entities.
 	*/
-	public function __construct($name, Hydrator $hydr=NULL, Mapper $mapper=NULL, Cache $cache=NULL, IdentityMap $map=NULL){
+	public function __construct($name, Hydrator $hydr, Mapper $mapper=NULL, Cache $cache=NULL, IdentityMap $map=NULL){
 		$this->setName($name);
 		if($mapper) $this->setMapper($mapper);
-		if($hydr){
-			$this->setHydrator($hydr);
-			$this->setIdentityMap($map);
-		}
+		$this->setHydrator($hydr);
+		$this->setIdentityMap($map);
 		if($cache) $this->setCache($cache);
 		
 	}
@@ -99,7 +97,7 @@ class Repository{
 	
 	public function setHydrator(Hydrator $hydr){
 		$this->hydrator=$hydr;
-		if(!$this->mapper->getHydrator()){
+		if($this->mapper && !$this->mapper->getHydrator()){
 			$this->mapper->setHydrator($this->hydrator);
 		}
 	}
@@ -207,9 +205,6 @@ class Repository{
 			return $ids;
 		};
 		
-		if(!$this->identity_map){
-			$this->setIdentityMap();
-		}
 		$found=$this->findWithMapper($this->identity_map,$select);
 		if($limit && count($found) >= $limit){
 			return array_slice($found, 0 ,$limit);
@@ -276,10 +271,7 @@ class Repository{
 	*/
 	private function findWithMapper(Mapper $mapper=NULL, SelectStatement $select){
 		if(!$mapper){
-			if($this->identity_map){
-				$this->setIdentityMap();
-				$mapper=$this->identity_map;
-			}
+			$mapper=$this->identity_map;
 		}
 		$res=$mapper->find($select);
 		if($res && $mapper!=$this->identity_map){
@@ -302,18 +294,12 @@ class Repository{
 	Untracks entity object.
 	*/
 	public function untrack(AbstractEntity $e){
-		if(!$this->identity_map){
-			$this->setIdentityMap();
-		}
 		$this->identity_map->remove($e);
 	}
 	/**
 	Marks an entity as dirty.
 	*/
 	public function dirty(AbstractEntity $e){
-		if(!$this->identity_map){
-			$this->setIdentityMap();
-		}
 		$this->identity_map->dirty($e);
 	}
 	/**
@@ -342,9 +328,6 @@ class Repository{
 	@return bool
 	*/
 	public function isLoaded(AbstractEntity $e){
-		if(!$this->identity_map){
-			$this->setIdentityMap();
-		}
 		return $this->identity_map->isEntityLoaded($e);
 	}
 	/**
@@ -355,9 +338,6 @@ class Repository{
 	@return Entity
 	*/
 	public function relative($id){
-		if(!$this->identity_map){
-			$this->setIdentityMap();
-		}
 		return $this->identity_map->findRelative($id);
 	}
 	/**
@@ -368,9 +348,6 @@ class Repository{
 	@return array of Entity.
 	*/
 	public function relatives(array $ids){
-		if(!$this->identity_map){
-			$this->setIdentityMap();
-		}
 		$es=array();
 		foreach($ids as $id){
 			$es[]=$this->identity_map->findRelative($id);
@@ -383,9 +360,6 @@ class Repository{
 	@return void
 	*/
 	public function flush(){
-		if(!$this->identity_map){
-			throw new \RuntimeException('Can\'t do shit without identity map');
-		}
 		if(!$this->mapper){
 			throw new \RuntimeException('Can\'t do shit without mapper');
 		}
