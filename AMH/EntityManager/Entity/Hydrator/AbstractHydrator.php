@@ -3,6 +3,7 @@ namespace AMH\EntityManager\Entity\Hydrator;
 
 use AMH\EntityManager\Repository\Repository;
 use AMH\EntityManager\Entity\AbstractEntity as Entity;
+use AMH\EntityManager\Repository\Mapper\SelectStatement;
 
 /**
 @author Alex Horkun mindkilleralexs@gmail.com
@@ -98,5 +99,19 @@ abstract class AbstractHydrator{
 	@return array
 	*/
 	abstract public function extract(Entity $e);
+	/**
+	Checks if entity fits criteria.
+	
+	@return bool
+	*/
+	public function fitsCriteria(Entity $e, SelectStatement $criteria){
+		$filter=$criteria->getFilter();
+		$props=$this->extract($e);
+		foreach($filter as $prop=>$value){
+			if($props[$prop]!=$value){
+				return FALSE;
+			}
+		}
+	}
 }
 ?>
