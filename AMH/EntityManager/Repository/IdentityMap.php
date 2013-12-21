@@ -130,6 +130,12 @@ class IdentityMap extends Mapper{
 		return FALSE;
 	}
 	/**
+	@return int count of entities in identity map.
+	*/
+	public function count(){
+		return count($this->entities);
+	}
+	/**
 	Finds relative Entity, of not founds returns Entity obj only with ID.
 	
 	@param int ID.
