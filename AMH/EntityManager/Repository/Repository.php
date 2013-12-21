@@ -283,6 +283,9 @@ class Repository{
 		}
 		$res=$mapper->find($select);
 		if($res && $mapper!=$this->identity_map){
+			foreach($res as $e){
+				$e->setRepository($this);
+			}
 			$this->identity_map->addAllToMap($res);
 		}
 		
