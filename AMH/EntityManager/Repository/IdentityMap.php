@@ -164,7 +164,7 @@ class IdentityMap extends Mapper{
 	@param int|Entity ID or Entity obj.
 	*/
 	public function dirty($e){
-		if(($int=$this->has($e))>=0){
+		if(($ind=$this->has($e))>=0 && $this->entities[$ind]['entity']->id()){
 			$this->entities[$ind]['action']=self::FLUSH_ACTION_UPDATE;
 		}
 	}
