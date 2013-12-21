@@ -120,7 +120,7 @@ class SelectStatement{
 	@return array Of int IDs.
 	*/
 	public function getIds(){
-		return $ids;
+		return $this->ids;
 	}
 }
 ?>
