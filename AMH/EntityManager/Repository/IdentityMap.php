@@ -47,7 +47,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 				continue;
 			}
 			else{
-				$found[]=$e;
+				$found[]=$e['entity'];
 			}
 			
 			if($select->getLimit()>=count($found)){
