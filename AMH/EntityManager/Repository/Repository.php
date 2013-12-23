@@ -389,7 +389,9 @@ class Repository{
 			$this->mapper->update($e);
 		}
 		foreach($uow['remove'] as $e){
-			$this->mapper->remove($e);
+			if($e->id()){
+				$this->mapper->remove($e);
+			}
 			$this->identity_map->remove($e);
 		}
 		$this->identity_map->clearUnitOfWork();
