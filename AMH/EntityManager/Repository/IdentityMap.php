@@ -43,7 +43,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 			elseif(($ids=$select->getNotInIds()) && in_array($e->id(),$ids)){
 				continue;
 			}
-			elseif(!($this->getHydrator()->fitsCriteria($e['entity'],$select->getFilter()))){
+			elseif(!($e['entity']->fitsCriteria($select->getFilter()))){
 				continue;
 			}
 			else{
