@@ -112,7 +112,7 @@ abstract class AbstractMapper{
 	*/
 	abstract protected function loadEntityData($id);
 	/**
-	@return void
+	@return int ID.
 	*/
 	abstract public function add(Entity $e);
 	/**
