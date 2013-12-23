@@ -61,8 +61,16 @@ abstract class AbstractEntity{
 	/**
 	@return Repository
 	*/
-	public function getRepository(){
+	private function getRepository(){
 		return $this->repo;
+	}
+	/**
+	Checks if repo set for this entity.
+	
+	@return bool
+	*/
+	public function hasRepository(){
+		return (bool)$this->repo;
 	}
 	/**
 	Marks this entity as dirty.
@@ -71,6 +79,21 @@ abstract class AbstractEntity{
 		if($this->repo){
 			$this->repo->dirty($this);
 		}
+	}
+	/**
+	Checks if entity fits criteria.
+	
+	@return bool
+	*/
+	public function fitsCriteria(array $criteria){
+		$props=get_object_vars($this);
+		foreach($criteria as $prop=>$value){
+			if($props[$prop]!=$value){
+				return FALSE;
+			}
+		}
+		
+		return TRUE;
 	}
 }
 ?>
