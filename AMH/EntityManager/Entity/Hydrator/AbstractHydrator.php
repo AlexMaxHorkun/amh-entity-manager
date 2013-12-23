@@ -99,19 +99,5 @@ abstract class AbstractHydrator{
 	@return array
 	*/
 	abstract public function extract(Entity $e);
-	/**
-	Checks if entity fits criteria.
-	
-	@return bool
-	*/
-	public function fitsCriteria(Entity $e, SelectStatement $criteria){
-		$filter=$criteria->getFilter();
-		$props=$this->extract($e);
-		foreach($filter as $prop=>$value){
-			if($props[$prop]!=$value){
-				return FALSE;
-			}
-		}
-	}
 }
 ?>
