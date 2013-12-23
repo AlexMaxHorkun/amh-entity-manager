@@ -302,6 +302,12 @@ class Repository{
 		return FALSE;
 	}
 	/**
+	Removes entity (identity map marks it's flush action as remove).
+	*/
+	public function remove(AbstractEntity $e){
+		$this->identity_map->delete($e);
+	}
+	/**
 	Untracks entity object.
 	*/
 	public function untrack(AbstractEntity $e){

@@ -74,6 +74,17 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 		}
 	}
 	/**
+	Marks entity's flush action as remove.
+	*/
+	public function delete(Entity $e){
+		if(($ind=$this->has($e))&&$ind!=-1){
+			$this->entities[$ind]['action']=self::FLUSH_ACTION_REMOVE;
+		}
+		else{
+			$this->addToMap($e,self::FLUSH_ACTION_REMOVE);
+		}
+	}
+	/**
 	Checks if entity is stored.
 	
 	@param int|Entity Entity object or ID.
