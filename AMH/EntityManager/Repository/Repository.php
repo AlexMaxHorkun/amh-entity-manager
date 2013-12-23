@@ -294,7 +294,12 @@ class Repository{
 	Adds entity.
 	*/
 	public function persist(AbstractEntity $e){
-		return $this->identity_map->addToMap($e,IdentityMap::FLUSH_ACTION_INSERT);
+		if($this->identity_map->addToMap($e,IdentityMap::FLUSH_ACTION_INSERT)){
+			$e->setRepository($this);
+			return TRUE;
+		}
+		
+		return FALSE;
 	}
 	/**
 	Untracks entity object.
