@@ -196,7 +196,7 @@ class Repository{
 		if($limit<0) $limit=0;
 		$found=array();//Entities found
 		
-		$extractIds=function() use($found){
+		$extractIds=function() use(&$found){
 			$ids=array();
 			foreach($found as $e){
 				if($e->id()) $ids[]=$e->id();
