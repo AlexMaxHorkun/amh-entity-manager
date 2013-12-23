@@ -291,6 +291,12 @@ class Repository{
 		return $res;
 	}
 	/**
+	Adds entity.
+	*/
+	public function persist(AbstractEntity $e){
+		return $this->identity_map->addToMap($e,IdentityMap::FLUSH_ACTION_INSERT);
+	}
+	/**
 	Untracks entity object.
 	*/
 	public function untrack(AbstractEntity $e){
@@ -366,7 +372,13 @@ class Repository{
 		
 		$uow=$this->identity_map->unitOfWork();
 		foreach($uow['add'] as $e){
-			$this->mapper->add($e);
+			$id=(int)$this->mapper->add($e);
+			if($id>=0){
+				$e->setId($id);
+			}
+			else{
+				throw new \RuntimeException('Mapper '.get_class($this->mapper).'::add did not return new Entity\'s ID');
+			}
 		}
 		foreach($uow['update'] as $e){
 			$this->mapper->update($e);
@@ -375,6 +387,7 @@ class Repository{
 			$this->mapper->remove($e);
 			$this->identity_map->remove($e);
 		}
+		$this->identity_map->clearUnitOfWork();
 	}
 }
 ?>
