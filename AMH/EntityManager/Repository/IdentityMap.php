@@ -162,6 +162,16 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 			return $this->entities[$ind]['loaded']
 	}
 	/**
+	Marks entity as loaded.
+	
+	@return void
+	*/
+	public function setLoaded(Entity $e){
+		$ind=$this->has($e);
+		if($ind>=0)
+			$this->entities[$ind]['loaded']=TRUE;
+	}
+	/**
 	@return int count of entities in identity map.
 	*/
 	public function count(){
