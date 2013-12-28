@@ -158,39 +158,14 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	*/
 	public function isEntityLoaded(Entity $e){
 		$ind=$this->has($e);
-		if($ind>=0 && $this->entities[$ind]['loaded'])
-			return TRUE;
-					
-		return FALSE;
+		if($ind>=0)
+			return $this->entities[$ind]['loaded']
 	}
 	/**
 	@return int count of entities in identity map.
 	*/
 	public function count(){
 		return count($this->entities);
-	}
-	/**
-	Finds relative Entity, of not founds returns Entity obj only with ID.
-	
-	@param int ID.
-	
-	@return Entity
-	
-	@throws \RuntimeException
-	*/
-	public function findRelative($id){
-		$id=(int)$id;
-		if(($ind=$this->has($id))>=0){
-			return $this->entities[$ind]['entity'];
-		}
-		else{
-			if(!$this->getHydrator()){
-				throw \RuntimeException('No hydrator provided');
-			}
-			$e=$this->getHydrator()->create();
-			$e->setId($id);
-			return $e;
-		}
 	}
 	/**
 	Marks entity to be updated.
