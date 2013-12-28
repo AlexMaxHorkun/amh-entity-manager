@@ -320,6 +320,39 @@ class Repository{
 		$this->identity_map->dirty($e);
 	}
 	/**
+	Gets entity from identity map, if can't - fetches new, adds to map as not loaded.
+	
+	@param int ID.
+	
+	@return AbstractEntity
+	*/
+	public function getEntity($id){
+		$id=(int)$id;
+		if(($ind=$this->identity_map->has($id))!=-1){
+			return $this->identity_map[$ind];
+		}
+		else{
+			$e=$this->hydrator->create();
+			$e->setId($id);
+			$this->identity_map->addToMap($e,IdentityMap::FLUSH_ACTION_NONE,FALSE);
+			return $e;
+		}
+	}
+	/**
+	Returns array of Entities returned by getEntity method.
+	
+	@param array of (int)IDs.
+	
+	@return array
+	*/
+	public function getEntities(array $ids){
+		$es=array();
+		foreach($ids as $id){
+			$es[]=$this->getEntity($id);
+		}
+		return $es;
+	}
+	/**
 	Loads entity.
 	
 	@return bool If loaded successfuly.
@@ -339,6 +372,51 @@ class Repository{
 				$loaded=$this->mapper->load($e);
 			}
 			return $loaded;
+		}
+	}
+	/**
+	Loads entity using given mapper.
+	
+	Loads entity only if its in identity map and not loaded.
+	
+	@param AbstractEntity entity that needs to be loaded.
+	@param Mapper|null If null given uses DB Mapper.
+	
+	@throw \RuntimeException if no mapper given and this does not have DB mapper.
+	@throw \InvalidArgumentException If entity has no ID or not in identity map.
+	
+	@return bool On success.
+	*/
+	protected function loadWithMapper(AbstractEntity $e, Mapper $m=NULL){
+		if(!$m){
+			if($this->mapper){
+				$m=$this->mapper;
+			}
+			else{
+				throw new \RuntimeException('Cannot load entity without DB mapper, use '.get_class($this).'::setMapper(Mapper)');
+			}
+		}
+		if(!$e->id()){
+			throw new \InvalidArgumentException('Cannot load entity data with no Entity ID');
+		}
+		if($this->identity_map->has($e)==-1){
+			throw new \InvalidArgumentException('Entity is not in Identity Map');
+		}
+		if($this->isLoaded($e)){
+			return TRUE;
+		}
+		else{
+			$select=new SelectStatement();
+			$select->setIds(array($e->id()));
+			$res=array_values($m->find($select));
+			if(!$res){
+				return FALSE;
+			}
+			else{
+				$this->hydrator->hydrate($e,$res[0]);
+				$this->identity_map->setLoaded($e);
+				return TRUE;
+			}
 		}
 	}
 	/**
