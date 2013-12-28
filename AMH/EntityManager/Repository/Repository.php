@@ -363,16 +363,18 @@ class Repository{
 		if(!$this->isLoaded($e)){
 			$loaded=FALSE;
 			if($this->cache){
-				$loaded=$this->cache->load($e);
+				$loaded=$this->loadWithMapper($e,$this->cache);
 			}
 			if(!$loaded){
 				if(!$this->mapper){
 					throw \RuntimeException('Cannot load entity without db mapper.');
 				}
-				$loaded=$this->mapper->load($e);
+				$loaded=$this->loadWithMapper($e,$this->mapper);
 			}
 			return $loaded;
 		}
+		
+		return TRUE;
 	}
 	/**
 	Loads entity using given mapper.
