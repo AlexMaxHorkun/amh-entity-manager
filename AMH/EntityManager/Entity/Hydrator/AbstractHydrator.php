@@ -42,7 +42,7 @@ abstract class AbstractHydrator{
 			if(!$repo){
 				throw new \RuntimeException('Repository '.$name.' doesn\'t exist');
 			}
-			return $repo->relative($id);
+			return $repo->getEntity($id);
 		}
 		else{
 			throw new \RuntimeException('Cannot find relative entity without link to EntityManager');
@@ -60,7 +60,7 @@ abstract class AbstractHydrator{
 	*/
 	protected function relatives($name, array $ids){
 		if(($em=$this->repo->getEntityManager()) && ($repo=$em->getRepository($name))){
-			return $repo->relatives($ids);
+			return $repo->getEntities($ids);
 		}
 		else{
 			throw new \RuntimeException('Cannot find relative entity without link to Entitymanager');
