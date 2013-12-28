@@ -89,21 +89,6 @@ abstract class AbstractMapper{
 	*/
 	abstract protected function findEntities(SelSttm $s);
 	/**
-	@param Entity
-	
-	@return bool TRUE if entity data found.
-	*/
-	public function load(Entity $e){
-		$data=$this->loadEntityData($e->id());
-		if($data){
-			$this->hydrator->hydrate($e, $data);
-			return TRUE;
-		}
-		else{
-			return FALSE;
-		}
-	}
-	/**
 	@return int ID.
 	*/
 	abstract public function add(Entity $e);
