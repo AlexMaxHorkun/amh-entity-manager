@@ -108,30 +108,36 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	
 	@param Entity $e Entity.
 	@param int Flush action.
+	@param bool Is loaded?.
 	
 	@throws \InvalidArgumentException if wrong Flush Action given.
 	
-	@return bool True if saved, FALSE if entity is already saved.
+	@return bool True if saved, FALSE if entity is already saved and loaded, otherwise if new given entity is loaded, extracts its data for already stored entity and makes it loaded.
 	*/
-	public function addToMap(Entity $e, $f_action=self::FLUSH_ACTION_NONE){
-		if($this->has($e) == -1){
-			switch($f_action){
-			case self::FLUSH_ACTION_NONE:
-			case self::FLUSH_ACTION_INSERT:
-			case self::FLUSH_ACTION_UPDATE:
-			case self::FLUSH_ACTION_REMOVE:
+	public function addToMap(Entity $e, $f_action=self::FLUSH_ACTION_NONE, $loaded=TRUE){
+		$loaded=(bool)$loaded;
+		switch($f_action){
+		case self::FLUSH_ACTION_NONE:
+		case self::FLUSH_ACTION_INSERT:
+		case self::FLUSH_ACTION_UPDATE:
+		case self::FLUSH_ACTION_REMOVE:
+			if(($ind=$this->has($e))!=-1){
 				$this->entities[]=array(
 					'entity'=>$e,
 					'action'=>(int)$f_action,
-					'loaded'=>TRUE,
+					'loaded'=>$loaded,
 				);
-				break;
-			default:
-				throw new \InvalidArgumentException('Invalid flush action given');
-				break;
+				return TRUE;
 			}
-			
-			return TRUE;
+			elseif($loaded && !$this->entities[$ind]['loaded']){
+				$this->getHydrator()->hydrate($this->entities[$ind]['entity'],$this->getHydrator()->extract($e));
+				$this->entities[$ind]['loaded']=TRUE;
+				return TRUE;
+			}
+			break;
+		default:
+			throw new \InvalidArgumentException('Invalid flush action given');
+			break;
 		}
 		
 		return FALSE;
