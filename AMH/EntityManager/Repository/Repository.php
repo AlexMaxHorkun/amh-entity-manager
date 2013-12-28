@@ -348,30 +348,6 @@ class Repository{
 		return $this->identity_map->isEntityLoaded($e);
 	}
 	/**
-	Searches for relative Entity in indentity map.
-	
-	@param int ID.
-	
-	@return Entity
-	*/
-	public function relative($id){
-		return $this->identity_map->findRelative($id);
-	}
-	/**
-	Searches for relatives Entity in indentity map.
-	
-	@param array IDs.
-	
-	@return array of Entity.
-	*/
-	public function relatives(array $ids){
-		$es=array();
-		foreach($ids as $id){
-			$es[]=$this->identity_map->findRelative($id);
-		}
-		return $es;
-	}
-	/**
 	Saves changes done to entities.
 	
 	@return void
