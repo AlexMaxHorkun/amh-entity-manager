@@ -61,16 +61,8 @@ abstract class AbstractEntity{
 	/**
 	@return Repository
 	*/
-	private function getRepository(){
+	public function getRepository(){
 		return $this->repo;
-	}
-	/**
-	Checks if repo set for this entity.
-	
-	@return bool
-	*/
-	public function hasRepository(){
-		return (bool)$this->repo;
 	}
 	/**
 	Marks this entity as dirty.
