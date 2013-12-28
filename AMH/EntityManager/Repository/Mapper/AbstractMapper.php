@@ -104,14 +104,6 @@ abstract class AbstractMapper{
 		}
 	}
 	/**
-	Loads entity data.
-	
-	@param int ID.
-	
-	@return array|null of data for hydrator, or null if no data available.
-	*/
-	abstract protected function loadEntityData($id);
-	/**
 	@return int ID.
 	*/
 	abstract public function add(Entity $e);
