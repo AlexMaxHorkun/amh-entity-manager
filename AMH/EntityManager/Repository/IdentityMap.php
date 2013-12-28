@@ -57,10 +57,6 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 		return $found;
 	}
 	
-	protected function loadEntityData($id){}
-	
-	public function load(Entity $e){}
-	
 	public function add(Entity $e){
 		$this->addToMap($e);
 		return $e->id();
