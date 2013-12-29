@@ -97,6 +97,7 @@ class Repository{
 	
 	public function setHydrator(Hydrator $hydr){
 		$this->hydrator=$hydr;
+		$hydr->setRepository($this);
 		if($this->mapper && !$this->mapper->getHydrator()){
 			$this->mapper->setHydrator($this->hydrator);
 		}
