@@ -33,17 +33,22 @@ abstract class AbstractEntity{
 	Loads entity from DB.
 	
 	@throws \RuntimeException If ID's undefined.
+	
+	@return bool TRUE on success.
 	*/
 	protected function load(){
-		if(!$this->isLoaded()){
-			if($this->id){
-				$this->repo->load($this);
-				$this->loaded=TRUE;
-			}
-			else{
-				throw new \RuntimeException(get_class($this).'::'.__FUNCTION__.' - Cannot load an entity without ID');
+		if($this->repo){
+			if(!$this->isLoaded()){
+				if($this->id){
+					$this->repo->load($this);
+					return TRUE;
+				}
+				else{
+					throw new \RuntimeException(get_class($this).'::'.__FUNCTION__.' - Cannot load an entity without ID');
+				}
 			}
 		}
+		return FALSE;
 	}
 	/**
 	@return bool
