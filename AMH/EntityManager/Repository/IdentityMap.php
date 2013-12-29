@@ -117,7 +117,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 		case self::FLUSH_ACTION_INSERT:
 		case self::FLUSH_ACTION_UPDATE:
 		case self::FLUSH_ACTION_REMOVE:
-			if(($ind=$this->has($e))!=-1){
+			if(($ind=$this->has($e))==-1){
 				$this->entities[]=array(
 					'entity'=>$e,
 					'action'=>(int)$f_action,
