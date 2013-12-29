@@ -159,7 +159,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	public function isEntityLoaded(Entity $e){
 		$ind=$this->has($e);
 		if($ind>=0)
-			return $this->entities[$ind]['loaded']
+			return $this->entities[$ind]['loaded'];
 	}
 	/**
 	Marks entity as loaded.
