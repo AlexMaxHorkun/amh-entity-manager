@@ -49,7 +49,12 @@ abstract class AbstractEntity{
 	@return bool
 	*/
 	protected function isLoaded(){
-		return $this->repo->isLoaded($this);
+		if($this->repo){
+			return $this->repo->isLoaded($this);
+		}
+		else{
+			throw new \RuntimeException(get_class($this).'::'.__FUNCTION__.' - repository is not set');
+		}
 	}
 	
 	public function setRepository(Repository $r){
