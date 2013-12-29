@@ -37,7 +37,7 @@ abstract class AbstractHydrator{
 	@throws \RuntimeException
 	*/
 	protected function relative($name, $id){
-		if($em=$this->repo->getEntityManager()){
+		if($this->repo && ($em=$this->repo->getEntityManager())){
 			$repo=$em->getRepository($name);
 			if(!$repo){
 				throw new \RuntimeException('Repository '.$name.' doesn\'t exist');
