@@ -334,6 +334,7 @@ class Repository{
 		else{
 			$e=$this->hydrator->create();
 			$e->setId($id);
+			$e->setRepository($this);
 			$this->identity_map->addToMap($e,IdentityMap::FLUSH_ACTION_NONE,FALSE);
 			return $e;
 		}
