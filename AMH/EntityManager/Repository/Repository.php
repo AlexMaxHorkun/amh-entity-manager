@@ -417,8 +417,8 @@ class Repository{
 				return FALSE;
 			}
 			else{
-				$this->hydrator->hydrate($e,$res[0]);
 				$this->identity_map->setLoaded($e);
+				$this->hydrator->hydrate($e,$this->hydrator->extract($res[0]));
 				return TRUE;
 			}
 		}

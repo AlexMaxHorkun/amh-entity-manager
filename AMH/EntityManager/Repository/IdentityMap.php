@@ -126,8 +126,8 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 				return TRUE;
 			}
 			elseif($loaded && !$this->entities[$ind]['loaded']){
-				$this->getHydrator()->hydrate($this->entities[$ind]['entity'],$this->getHydrator()->extract($e));
 				$this->entities[$ind]['loaded']=TRUE;
+				$this->getHydrator()->hydrate($this->entities[$ind]['entity'],$this->getHydrator()->extract($e));
 				return TRUE;
 			}
 			break;
@@ -158,8 +158,9 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	*/
 	public function isEntityLoaded(Entity $e){
 		$ind=$this->has($e);
-		if($ind>=0)
+		if($ind!=-1)
 			return $this->entities[$ind]['loaded'];
+		return FALSE;
 	}
 	/**
 	Marks entity as loaded.
