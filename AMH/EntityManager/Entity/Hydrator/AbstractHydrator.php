@@ -3,7 +3,6 @@ namespace AMH\EntityManager\Entity\Hydrator;
 
 use AMH\EntityManager\Repository\Repository;
 use AMH\EntityManager\Entity\AbstractEntity as Entity;
-use AMH\EntityManager\Repository\Mapper\SelectStatement;
 
 /**
 @author Alex Horkun mindkilleralexs@gmail.com
@@ -23,7 +22,6 @@ abstract class AbstractHydrator{
 	}
 	
 	public function setRepository(Repository $repo){
-		$repo->setHydrator($this);
 		$this->repo=$repo;
 	}
 	/**
