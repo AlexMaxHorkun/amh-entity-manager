@@ -18,7 +18,7 @@ class Repository{
 	/**
 	@var IdentityMap
 	*/
-	protected $identity_map;
+	protected $identity_map=NULL;
 	/**
 	@var string
 	*/
