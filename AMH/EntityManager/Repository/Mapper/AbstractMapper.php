@@ -21,7 +21,7 @@ abstract class AbstractMapper{
 	*/
 	private $hydrator=NULL;
 	
-	public function __construct(Repository $repo,Hydrator $hydr){
+	public function __construct(Repository $repo, Hydrator $hydr){
 		$this->setRepository($repo);
 		$this->setHydrator($hydr);
 	}
@@ -34,51 +34,11 @@ abstract class AbstractMapper{
 	@limit int|null Maxim amount of entities to return.
 	@param array $not_in_ids of Entity IDs.
 	
-	@return array of Entity.
+	@return array of Entity data:array.
 	*/
 	public function find(SelSttm $s){
 		$data=$this->findEntities($s);
-		if($data){
-			$es=array();
-			foreach($data as $e){
-				$es[]=$this->hydrator->createFrom($e);
-			}
-			
-			return $es;
-		}
-		else{
-			return array();
-		}
-	}
-	/**
-	Creates entities from array of array data with hydrator.
-	
-	@throws \RuntimeException if no hydrator provided.
-	@throws \RuntimeException if hydrator returns not an Entity.
-	
-	@param array Data.
-	
-	@return array of Entity.
-	*/
-	protected function createEntities(array $data){
-		if(!$this->hydrator){
-			throw \RuntimeException('No hydrator provided');
-			return;
-		}
-		
-		$es=array();
-		foreach($data as $e_data){
-			$e=$this->hydrator->createFrom($e_data);
-			if($e instanceof Entity){
-				$es[]=$e;
-			}
-			else{
-				throw new \RuntimeException('Hydrator did not return an Entity from createFrom method');
-				return;
-			}
-		}
-		
-		return $es;
+		return $this->fetchEntities($data);
 	}
 	/**
 	Finds entities data.
@@ -88,6 +48,20 @@ abstract class AbstractMapper{
 	@return array of Entities data.
 	*/
 	abstract protected function findEntities(SelSttm $s);
+	/**
+	Creates Entities from data received from findEntities.
+	
+	@param array
+	
+	@return array of Entity.
+	*/
+	private function fetchEntities(array $data){
+		$es=array();
+		foreach($data as $e_data){
+			$es[]=$this->repo->add($e_data);
+		}
+		return $es;
+	}
 	/**
 	@return int ID.
 	*/
