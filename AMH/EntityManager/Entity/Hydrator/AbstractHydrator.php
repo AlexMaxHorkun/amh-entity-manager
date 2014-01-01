@@ -65,23 +65,25 @@ abstract class AbstractHydrator{
 		}
 	}
 	/**
-	Creates Entity from array containing id and relative entities' ids.
-	
-	@param array Entity data.
+	Creates new instance of entity.
 	
 	@return Entity
 	*/
-	public function createFrom(array $data){
-		$e=$this->create();
-		$this->hydrate($e,$data);
-		return $e;
-	}
+	abstract public function newEntity();
 	/**
 	Creates Entity.
 	
+	@param int|null ID.
+	
 	@return Entity
 	*/
-	abstract public function create();
+	public function create($id){
+		$e=$this->newEntity();
+		if($id>0){
+			$e->setId((int)$id);
+		}
+		return $e;
+	}
 	/**
 	@param Entity
 	@param array Data.
@@ -97,5 +99,19 @@ abstract class AbstractHydrator{
 	@return array
 	*/
 	abstract public function extract(Entity $e);
+	/**
+	Extracts ID from array received from mapper or else to fetch an entity.
+	
+	@param array
+	@return int
+	
+	@throw \InvalidArgumentException If data has no id in it.
+	*/
+	public function extractId(array $data){
+		if(!isset($data['id'])){
+			throw new \InvalidArgumentException('given array has no "id" key');
+		}
+		return (int)$data['id'];
+	}
 }
 ?>
