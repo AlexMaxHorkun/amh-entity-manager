@@ -1,7 +1,7 @@
 <?php
 namespace AMH\EntityManager;
 
-use AMH\EntityManager\Cache\CacheInterface;
+use AMH\EntityManager\Cache\AbstractCache as Cache;
 use AMH\EntityManager\Repository\Repository;
 
 /**
@@ -15,14 +15,14 @@ class EntityManager{
 	*/
 	private $repos=array();
 	/**
-	@var Cache\CacheInterface Default cache that will be given to all new repos if they doesn't have one.
+	@var Cache Default cache that will be given to all new repos if they doesn't have one.
 	*/
 	private $default_cache=NULL;
 	/**
 	@param array of Repository.
 	@throws \InvalidArgumentException if array given as first argument contains something but repositories.
 	*/
-	public function __construct(array $repos=array(), Cache\CacheInterface $cache=NULL){
+	public function __construct(array $repos=array(), Cache $cache=NULL){
 		if($repos){
 			$this->setRepositories($repos);
 		}
@@ -34,11 +34,11 @@ class EntityManager{
 	/**
 	Sets default Cache that will be given to all new repos.
 	*/
-	public function setDefaultCache(CacheInterface $cache){
+	public function setDefaultCache(Cache $cache){
 		$this->default_cache=$cache;
 	}
 	/**
-	@return CacheInterface
+	@return Cache
 	*/
 	public function getDefaultCache(){
 		return $this->default_cache;
