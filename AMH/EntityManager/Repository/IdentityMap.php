@@ -5,6 +5,8 @@ use AMH\EntityManager\Repository\Mapper\AbstractMapper as Mapper;
 use AMH\EntityManager\Entity\AbstractEntity as Entity;
 use AMH\EntityManager\Repository\Mapper\SelectStatement as SelSttm;
 use AMH\EntityManager\Entity\Hydrator\AbstractHydrator as Hydrator;
+use AMH\EntityManager\Repository\Repository as Repository;
+use AMH\EntityManager\Repository\EntityContainer as Container;
 
 /**
 Manages loaded from mappers entities.
@@ -12,18 +14,29 @@ Manages loaded from mappers entities.
 @author Alex Horkun mindkilleralexs@gmail.com
 */
 class IdentityMap extends Mapper implements \ArrayAccess{
-	const FLUSH_ACTION_NONE=0;
-	const FLUSH_ACTION_INSERT=1;
-	const FLUSH_ACTION_UPDATE=2;
-	const FLUSH_ACTION_REMOVE=3;
-	
 	/**
-	@var array Of Entities, their flush action and loaded attribute.
+	@var Container
 	*/
-	protected $entities=array();
+	protected $container=NULL;
 	
-	public function __construct(Repository $r, Hydrator $h){
+	public function __construct(Repository $r, Hydrator $h, Container $c=NULL){
 		parent::__construct($r,$h);
+		if($c){
+			$this->setContainer($c);
+		}
+		else{
+			$this->setContainer(new Container());
+		}
+	}
+	
+	public function setContainer(Container $c){
+		$this->container=$c;
+	}
+	/**
+	@return Container
+	*/
+	public function getContainer(){
+		return $this->container;
 	}
 	/**
 	@return array of Entity.
@@ -57,15 +70,28 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 		return $found;
 	}
 	
-	public function add(Entity $e){
+	public function add($e){
 		$this->addToMap($e);
-		return $e->id();
+		if($e instanceof Entity){
+			return $e->id();
+		}
+		elseif(is_array($e)){
+			return $this->getHydrator()->extractId($e);
+		}
+	}
+	/**
+	Marks entity to be updated.
+	
+	@param int|Entity ID or Entity obj.
+	*/
+	public function update($e){
+		if(($ind=$this->indexOf($e))>=0 && $this->entities[$ind]->getEntity()->id()){
+			$this->entities[$ind]->setFlushAction(Container::FLUSH_ACTION_UPDATE);
+		}
 	}
 	
-	public function update(Entity $e){}
-	
 	public function remove(Entity $e){
-		if(($ind=$this->has($e))>=0){
+		if(($ind=$this->indexOf($e))>=0){
 			unset($this->entities[$ind]);
 		}
 	}
@@ -73,26 +99,24 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	Marks entity's flush action as remove.
 	*/
 	public function delete(Entity $e){
-		if(($ind=$this->has($e))&&$ind!=-1){
-			$this->entities[$ind]['action']=self::FLUSH_ACTION_REMOVE;
+		if(($ind=$this->indexOf($e))&&$ind!=-1){
+			$this->entities[$ind]->setAction(Container::FLUSH_ACTION_REMOVE);
 		}
 		else{
-			$this->addToMap($e,self::FLUSH_ACTION_REMOVE);
+			$this->addToMap($e,Container::FLUSH_ACTION_REMOVE);
 		}
 	}
 	/**
-	Checks if entity is stored.
-	
 	@param int|Entity Entity object or ID.
 	
 	@return int Idnex or -1 if not found.
 	*/
-	public function has($e){
+	public function indexOf($e){
 		if(!($e instanceof Entity)){
 			$e=(int)$e;
 		}
 		foreach($this->entities as $key=>$data){
-			if((($e instanceof Entity) && $data['entity']===$e) || (gettype($e)=='int' && ($e>=0) && $e==$data['entity']->id())){
+			if((($e instanceof Entity) && $data->getEntity()===$e) || (gettype($e)=='int' && ($e>=0) && $e==$data->getEntity()->id())){
 				return $key;
 			}
 		}
@@ -100,43 +124,65 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 		return -1;
 	}
 	/**
+	Checks if map has entity.
+	
+	@param int|Entity Entity object or ID.
+	
+	@return bool
+	*/
+	public function has($e){
+		return ($this->indexOf($e)!=-1);
+	}
+	/**
 	Adds entity to object's storage.
 	
-	@param Entity $e Entity.
+	@param Entity|array $e Entity/Entity data.
 	@param int Flush action.
 	@param bool Is loaded?.
 	
 	@throws \InvalidArgumentException if wrong Flush Action given.
+	@throws \InvalidArgumentException If $e is not an array or Entity.
 	
-	@return bool True if saved, FALSE if entity is already saved and loaded, otherwise if new given entity is loaded, extracts its data for already stored entity and makes it loaded.
+	@return Entity
 	*/
-	public function addToMap(Entity $e, $f_action=self::FLUSH_ACTION_NONE, $loaded=TRUE){
+	public function addToMap($e, $f_action=self::FLUSH_ACTION_NONE, $loaded=TRUE){
+		if(!($e instanceof Entity || is_array($e))){
+			throw new \InvalidArgumentException('Given argument is not an Entity or Entity data');
+		}
 		$loaded=(bool)$loaded;
 		switch($f_action){
 		case self::FLUSH_ACTION_NONE:
 		case self::FLUSH_ACTION_INSERT:
 		case self::FLUSH_ACTION_UPDATE:
 		case self::FLUSH_ACTION_REMOVE:
-			if(($ind=$this->has($e))==-1){
-				$this->entities[]=array(
-					'entity'=>$e,
+			if(($ind=$this->indexOf((is_array($e))? $this->getHydrator()->extractId($e): $e))==-1){
+				if($e instanceof Entity){
+					$entity=$e;
+				}
+				else{
+					$entity=$this->getHydrator()->create();
+					$entity->setId($this->getHydrator()->extractId($e));
+					$entity->setRepository($this->getRepository());
+				}
+				$record=array(
+					'entity'=>$entity,
 					'action'=>(int)$f_action,
-					'loaded'=>$loaded,
+					'loaded'=>(is_array($e))? FALSE:$loaded,
+					'data'=>(is_array($e))? $e:NULL,
 				);
-				return TRUE;
+				$this->entities[]=$record;
+				return $record['entity'];
 			}
 			elseif($loaded && !$this->entities[$ind]['loaded']){
 				$this->entities[$ind]['loaded']=TRUE;
-				$this->getHydrator()->hydrate($this->entities[$ind]['entity'],$this->getHydrator()->extract($e));
-				return TRUE;
+				$this->getHydrator()->hydrate($this->entities[$ind]['entity'],(is_array($e))? $e : $this->getHydrator()->extract($e));
+				return $this->entities[$ind]['entity'];
 			}
 			break;
 		default:
 			throw new \InvalidArgumentException('Invalid flush action given');
 			break;
 		}
-		
-		return FALSE;
 	}
 	/**
 	Adds multiple entities to object's storage.
@@ -157,7 +203,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	@return bool
 	*/
 	public function isEntityLoaded(Entity $e){
-		$ind=$this->has($e);
+		$ind=$this->indexOf($e);
 		if($ind!=-1)
 			return $this->entities[$ind]['loaded'];
 		return FALSE;
@@ -168,9 +214,29 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	@return void
 	*/
 	public function setLoaded(Entity $e){
-		$ind=$this->has($e);
+		$ind=$this->indexOf($e);
 		if($ind>=0)
 			$this->entities[$ind]['loaded']=TRUE;
+	}
+	/**
+	Loads entity if already having data provided.
+	
+	@param Entity
+	@return bool TRUE on success.
+	*/
+	public function load(Entity $e){
+		if(($ind=$this->indexOf($e))!=-1){
+			if(!$this->entities[$ind]['loaded']){
+				if($this->entities[$ind]['data']){
+					$this->getHydrator()->hydrate($this->entities[$ind]['entity'],$this->entities[$ind]['data']);
+				}
+				else{
+					return FALSE;
+				}
+			}
+			return TRUE;
+		}
+		return FALSE;
 	}
 	/**
 	@return int count of entities in identity map.
@@ -179,20 +245,10 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 		return count($this->entities);
 	}
 	/**
-	Marks entity to be updated.
-	
-	@param int|Entity ID or Entity obj.
-	*/
-	public function dirty($e){
-		if(($ind=$this->has($e))>=0 && $this->entities[$ind]['entity']->id()){
-			$this->entities[$ind]['action']=self::FLUSH_ACTION_UPDATE;
-		}
-	}
-	/**
 	@return int flush action
 	*/
 	public function flushAction(Entity $e){
-		if(($ind=$this->has($e))>=0){
+		if(($ind=$this->indexOf($e))>=0){
 			return $this->entities[$ind]['action'];
 		}
 		return FALSE;
