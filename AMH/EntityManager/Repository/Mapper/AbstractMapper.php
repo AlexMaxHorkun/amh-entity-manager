@@ -55,7 +55,7 @@ abstract class AbstractMapper{
 	
 	@return array of Entity.
 	*/
-	private function fetchEntities(array $data){
+	protected function fetchEntities(array $data){
 		$es=array();
 		foreach($data as $e_data){
 			$es[]=$this->repo->add($e_data);
