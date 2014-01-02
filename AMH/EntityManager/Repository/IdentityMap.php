@@ -191,15 +191,10 @@ class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
 	*/
 	public function load(Entity $e){
 		if(($ind=$this->indexOf($e))!=-1){
-			if(!$this->entities[$ind]->getEntity()->isLoaded()){
-				if($this->entities[$ind]->getData()){
-					$this->getHydrator()->hydrate($this->entities[$ind]->getEntity(),$this->entities[$ind]->getData());
-				}
-				else{
-					return FALSE;
-				}
+			if($this->entities[$ind]->getData()){
+				$this->getHydrator()->hydrate($this->entities[$ind]->getEntity(),$this->entities[$ind]->getData());
+				return TRUE;
 			}
-			return TRUE;
 		}
 		return FALSE;
 	}

@@ -75,7 +75,7 @@ abstract class AbstractMapper{
 			throw new \InvalidArgumentException('Entity must have an ID');
 		}
 		$select->setIds(array($e->id()));
-		$data=$this->findEntities();
+		$data=$this->findEntities($select);
 		if($data){
 			$data=array_values($data);
 			$data=$data[0];

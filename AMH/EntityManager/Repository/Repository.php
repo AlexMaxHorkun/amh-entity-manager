@@ -182,51 +182,6 @@ class Repository{
 	*/
 	public function findBy(SelectStatement $select){
 		$found=array();//Entities found
-		
-		/*$extractIds=function() use(&$found){
-			$ids=array();
-			foreach($found as $e){
-				if($e->id()) $ids[]=$e->id();
-			}
-			
-			return $ids;
-		};
-		
-		$found=$this->findWithMapper($this->identity_map,$select);
-		if($limit && count($found) >= $limit){
-			return array_slice($found, 0 ,$limit);
-		}
-		
-		$select->setNotInIds($extractIds());
-		if($select->getLimit()){
-			$select->setLimit($select->getLimit()-count($found));
-		}
-		//Work with cache similar to mapper
-		if($this->cache){
-			$found=array_merge($found, $this->findWithMapper($this->cache, $select));
-			$select->setNotInIds($extractIds());
-			if($limit && count($found) >= $limit){
-				return array_slice($found, 0 ,$limit);
-			}
-			if($select->getLimit()){
-				$select->setLimit($select->getLimit()-count($found));
-			}
-		}		
-				
-		//Working with mapper
-		if(!$this->mapper){
-			throw new \RuntimeException('Cannot find entities without DB mapper');
-			return NULL;
-		}
-		
-		$found=array_merge($found, ($this->findWithMapper($this->mapper,$select)));
-			
-		if($limit && count($found) >= $limit){
-			return array_slice($found, 0 ,$limit);
-		}
-		else{
-			return $found;
-		}*/
 		foreach($this->mappers as $m){
 			if(!$m) continue;
 			$found=array_merge($found,$m->find($select));
@@ -303,13 +258,13 @@ class Repository{
 	Untracks entity object.
 	*/
 	public function untrack(AbstractEntity $e){
-		$this->identity_map->untrack($e);
+		$this->mappers['identity_map']->untrack($e);
 	}
 	/**
 	Marks an entity as dirty.
 	*/
 	public function dirty(AbstractEntity $e){
-		$this->identity_map->dirty($e);
+		$this->mappers['identity_map']->update($e);
 	}
 	/**
 	Gets entity from identity map, if can't - fetches new, adds to map as not loaded.
@@ -320,12 +275,12 @@ class Repository{
 	*/
 	public function getEntity($id){
 		$id=(int)$id;
-		if(($ind=$this->identity_map->indexOf($id))!=-1){
-			return $this->identity_map[$ind];
+		if(($ind=$this->mappers['identity_map']->indexOf($id))!=-1){
+			return $this->mappers['identity_map'][$ind];
 		}
 		else{
 			$e=$this->hydrator->create($id);
-			$this->identity_map->addToMap($e,IdentityMap::FLUSH_ACTION_NONE);
+			$this->mappers['identity_map']->addToMap($e);
 			$e->setRepository($this);
 			return $e;
 		}
@@ -352,16 +307,12 @@ class Repository{
 	@throws \RuntimeException If no mapper given.
 	*/
 	public function load(AbstractEntity $e){
-		if(!$e->isLoaded()){
-			foreach($this->mapper as $m){
-				if($m->load($e)){
-					return TRUE;
-				}
+		foreach($this->mappers as $m){
+			if($m && $m->load($e)){
+				return TRUE;
 			}
-			return FALSE;
 		}
-		
-		return TRUE;
+		return FALSE;
 	}
 	/**
 	Saves changes done to entities.
