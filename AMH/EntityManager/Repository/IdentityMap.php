@@ -17,7 +17,7 @@ class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
 	/**
 	@var Container
 	*/
-	protected $container=NULL;
+	protected $entities=array();
 	
 	public function __construct(Repository $r, Hydrator $h, Container $c=NULL){
 		parent::__construct($r,$h);
