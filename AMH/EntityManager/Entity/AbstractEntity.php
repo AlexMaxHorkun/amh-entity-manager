@@ -44,6 +44,7 @@ abstract class AbstractEntity{
 		if($this->repo){
 			if(!$this->isLoaded()){
 				if($this->id){
+					$this->loaded=TRUE;
 					$this->loaded=$this->repo->load($this);
 				}
 				else{
