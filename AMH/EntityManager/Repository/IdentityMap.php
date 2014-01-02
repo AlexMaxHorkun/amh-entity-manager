@@ -170,8 +170,8 @@ class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
 			elseif(is_array($e)){
 				$e_cont->setEntity($this->getHydrator()->create($this->hydrator()->extractId($e)));
 				$e_cont->setData($e);
-				$e_cont->getEntity()->setRepository($this->getRepository());
 			}
+			$e_cont->getEntity()->setRepository($this->getRepository());
 			$this->entities[]=$e_cont;
 			return $e_cont->getEntity();
 		}
@@ -250,7 +250,7 @@ class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
 	*/
 	public function clearUnitOfWork(){
 		foreach($this->entities as $key=>$e_data){
-			$this->entities[$key]['action']=self::FLUSH_ACTION_NONE;
+			$this->entities[$key]->setFlushAction(Container::FLUSH_ACTION_NONE);
 		}
 	}
 	
