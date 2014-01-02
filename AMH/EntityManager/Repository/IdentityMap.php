@@ -142,13 +142,13 @@ class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
 	
 	@return Entity
 	*/
-	public function addToMap($e, $f_action=self::FLUSH_ACTION_NONE){
+	public function addToMap($e, $f_action=Container::FLUSH_ACTION_NONE){
 		if(!($e instanceof Entity || is_array($e))){
 			throw new \InvalidArgumentException('Given argument is not an Entity or Entity data');
 		}
 		if(is_array($e)){
 			try{
-				$this->gteHydrator()->extractId($e);
+				$this->getHydrator()->extractId($e);
 			}
 			catch(\Exception $e){
 				throw new \InvalidArgumentException('array given to '.get_class($this).'::'.__FUNCTION__.' contains no ID');
@@ -161,7 +161,7 @@ class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
 				$e_cont->setEntity($e);
 			}
 			elseif(is_array($e)){
-				$e_cont->setEntity($this->getHydrator()->create($this->hydrator()->extractId($e)));
+				$e_cont->setEntity($this->getHydrator()->create($this->getHydrator()->extractId($e)));
 				$e_cont->setData($e);
 			}
 			$e_cont->getEntity()->setRepository($this->getRepository());

@@ -229,7 +229,7 @@ class Repository{
 		}*/
 		foreach($this->mappers as $m){
 			if(!$m) continue;
-			$found[]=$m->find($select);
+			array_merge($found,$m->find($select));
 			if($select->getLimit()){
 				if($select->getLimit()<=count($found)){
 					break;
