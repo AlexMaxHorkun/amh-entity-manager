@@ -63,6 +63,30 @@ abstract class AbstractMapper{
 		return $es;
 	}
 	/**
+	Loads entity data.
+	
+	@return bool TRUE on success.
+	
+	@throws \InvalidArgumentException If entity has no ID.
+	*/
+	public function load(Entity $e){
+		$select=new SelSttm();
+		if(!$e->id()){
+			throw new \InvalidArgumentException('Entity must have an ID');
+		}
+		$select->setIds(array($e->id()));
+		$data=$this->findEntities();
+		if($data){
+			$data=array_values($data);
+			$data=$data[0];
+			$this->hydrator->hydrate($e,$data);
+			return TRUE;
+		}
+		else{
+			return FALSE;
+		}
+	}
+	/**
 	@return int ID.
 	*/
 	abstract public function add(Entity $e);
