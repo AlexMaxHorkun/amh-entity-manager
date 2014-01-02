@@ -58,7 +58,7 @@ abstract class AbstractMapper{
 	protected function fetchEntities(array $data){
 		$es=array();
 		foreach($data as $e_data){
-			$es[]=$this->repo->add($e_data);
+			$es[]=$this->repo->addToIdentityMap($e_data);
 		}
 		return $es;
 	}

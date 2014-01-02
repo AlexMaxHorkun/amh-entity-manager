@@ -235,7 +235,7 @@ class Repository{
 					break;
 				}
 				else{
-					$select->setLimit($select->getLimit()-count($found))
+					$select->setLimit($select->getLimit()-count($found));
 				}
 			}
 			$ids=array();
@@ -282,6 +282,16 @@ class Repository{
 		}
 		
 		return FALSE;
+	}
+	/**
+	Adds entity to identity map.
+	
+	@param array|Entity
+	
+	@return Entity
+	*/
+	public function addToIdentityMap($e){
+		return $this->mappers['identity_map']->addToMap($e);
 	}
 	/**
 	Removes entity (identity map marks it's flush action as remove).

@@ -70,21 +70,14 @@ class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
 		return $found;
 	}
 	
-	public function add($e){
+	public function add(Entity $e){
 		$this->addToMap($e);
-		if($e instanceof Entity){
-			return $e->id();
-		}
-		elseif(is_array($e)){
-			return $this->getHydrator()->extractId($e);
-		}
+		return $e->id();
 	}
 	/**
 	Marks entity to be updated.
-	
-	@param int|Entity ID or Entity obj.
 	*/
-	public function update($e){
+	public function update(Entity $e){
 		if(($ind=$this->indexOf($e))>=0 && $this->entities[$ind]->getEntity()->id()){
 			$this->entities[$ind]->setFlushAction(Container::FLUSH_ACTION_UPDATE);
 		}
