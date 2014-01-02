@@ -22,6 +22,10 @@ abstract class AbstractEntity{
 	*/
 	private $loaded=FALSE;
 	/**
+	@var bool
+	*/
+	private $being_loaded=FALSE;
+	/**
 	@return int Database ID.
 	*/
 	public function id(){
@@ -41,18 +45,12 @@ abstract class AbstractEntity{
 	@return bool TRUE on success.
 	*/
 	protected function load(){
-		if($this->repo){
-			if(!$this->isLoaded()){
-				if($this->id){
-					$this->loaded=TRUE;
-					$this->loaded=$this->repo->load($this);
-				}
-				else{
-					throw new \RuntimeException(get_class($this).'::'.__FUNCTION__.' - Cannot load an entity without ID');
-				}
-			}
+		if($this->repo && !$this->loaded && !$this->being_loaded){
+			$this->being_loaded=TRUE;
+			$this->loaded=$this->repo->load($this);
+			$this->being_loaded=FALSE;
 		}
-		return $this->isLoaded();
+		return $this->loaded;
 	}
 	/**
 	@return bool

@@ -13,7 +13,7 @@ Manages loaded from mappers entities.
 
 @author Alex Horkun mindkilleralexs@gmail.com
 */
-class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
+class IdentityMap extends Mapper implements \ArrayAccess{
 	/**
 	@var Container
 	*/
@@ -111,7 +111,12 @@ class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
 			$e=(int)$e;
 		}
 		foreach($this->entities as $key=>$data){
-			if((($e instanceof Entity) && $data->getEntity()===$e) || (gettype($e)=='int' && ($e>=0) && $e==$data->getEntity()->id())){
+			if($e instanceof Entity){
+				if($e===$data->getEntity()){
+					return $key;
+				}
+			}
+			elseif($e==$data->getEntity()->id()){
 				return $key;
 			}
 		}
@@ -156,16 +161,16 @@ class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
 		}
 		if((($e instanceof Entity)&&!$this->has($e)) || (is_array($e)&&!$this->has($this->getHydrator()->extractId($e)))){
 			$e_cont=new Container();
+			$this->entities[]=$e_cont;
 			$e_cont->setFlushAction($f_action);
 			if($e instanceof Entity){
 				$e_cont->setEntity($e);
 			}
 			elseif(is_array($e)){
-				$e_cont->setEntity($this->getHydrator()->create($this->getHydrator()->extractId($e)));
 				$e_cont->setData($e);
+				$e_cont->setEntity($this->getHydrator()->create($this->getHydrator()->extractId($e)));				
 			}
 			$e_cont->getEntity()->setRepository($this->getRepository());
-			$this->entities[]=$e_cont;
 			return $e_cont->getEntity();
 		}
 		else{
@@ -259,21 +264,5 @@ class IdentityMap extends Mapper implements \ArrayAccess, \Iterator{
 	
 	public function offsetSet($i,$val){}
 	public function offsetUnset($i){}
-	//Iterator
-	public function current(){
-		return current($this->entities);
-	}
-	public function key(){
-		return key($this->entities);
-	}
-	public function next(){
-		return next($this->entities);
-	}
-	public function rewind(){
-		return rewind($this->entities);
-	}
-	public function valid(){
-		return valid($this->entities);
-	}
 }
 ?>
