@@ -49,21 +49,21 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	*/
 	protected function findEntities(SelSttm $select){
 		$found=array();
-		foreach($this->entities as $e){
-			if(($ids=$select->getIds()) && !in_array($e->id(),$ids)){
+		foreach($this->entities as $e_cont){
+			if(($ids=$select->getIds()) && !in_array($e_cont->getEntity()->id(),$ids)){
 				continue;
 			}
-			elseif(($ids=$select->getNotInIds()) && in_array($e->id(),$ids)){
+			elseif(($ids=$select->getNotInIds()) && in_array($e_cont->getEntity()->id(),$ids)){
 				continue;
 			}
-			elseif(!($e['entity']->fitsCriteria($select->getFilter()))){
+			elseif(($filter=$select->getFilter()) && !($e_cont->getEntity()->fitsCriteria($filter))){
 				continue;
 			}
 			else{
-				$found[]=$e['entity'];
+				$found[]=$e_cont->getEntity();
 			}
 			
-			if($select->getLimit()>=count($found)){
+			if($select->getLimit()<=count($found)){
 				break;
 			}
 		}	
@@ -174,7 +174,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 			return $e_cont->getEntity();
 		}
 		else{
-			throw new \RuntimeException('Cannot add existing entity');
+			throw new \RuntimeException('Cannot add existing entity to identity map');
 		}
 	}
 	/**
