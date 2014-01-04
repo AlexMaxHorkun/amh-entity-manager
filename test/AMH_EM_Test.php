@@ -45,6 +45,7 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 			self::$pdo->query('create table employee(
 				id int not null auto_increment primary key,
 				name varchar(255) not null,
+				salary int not null,
 				mentor int,
 				student int
 			)engine=innodb default charset=utf8');
@@ -65,7 +66,17 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 		}
 		self::$em->flush();
 		foreach($emps as $emp){
-			$this->assertGreaterThen(0,$emp->id());
+			$this->assertGreaterThan(0,$emp->id());
+		}
+		echo PHP_EOL.'Loading entities from db and comparing them to the ones stored in memory'.PHP_EOL;
+		$repo->getIdentityMap()->clear();
+		$emps_db=$repo->findAll();
+		$this->assertEquals(count($emps),count($emps_db));
+		for($i=0,$c=count($emps);$i<$c;$i++){
+			$this->assertEquals($emps[$i]->getName(),$emps_db[$i]->getName());
+			$this->assertEquals($emps[$i]->getSalary(),$emps_db[$i]->getSalary());
+			$this->assertEquals($emps[$i]->getMentor(),$emps_db[$i]->getMentor());
+			$this->assertEquals($emps[$i]->getStudent(),$emps_db[$i]->getStudent());
 		}
 	}
 	

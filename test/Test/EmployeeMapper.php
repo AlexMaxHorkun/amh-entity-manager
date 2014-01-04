@@ -60,8 +60,8 @@ class EmployeeMapper extends MapperQueryStat{
 		$stt=$this->pdo->prepare($query);
 		$stt->bindValue('name',$e->getName());
 		$stt->bindValue('salary',(int)$e->getSalary());
-		$stt->bindValue('mentor',($mentor=$e->getMentor())? $mentor:NULL);
-		$stt->bindValue('student',($student=$e->getStudent())? $student:NULL);
+		$stt->bindValue('mentor',($mentor=$e->getMentor())? $mentor->id():NULL);
+		$stt->bindValue('student',($student=$e->getStudent())? $student->id():NULL);
 		$stt->execute();
 		$this->addQueryToStat($query);
 		return $this->pdo->lastInsertId();
