@@ -12,6 +12,7 @@ include_once 'Test/Employee.php';
 include_once 'Test/EmployeeHydrator.php';
 include_once 'Test/MapperQueryStat.php';
 include_once 'Test/EmployeeMapper.php';
+use AMH\EntityManager\Repository\Mapper\SelectStatement;
 
 class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 	protected static $queries=array();
@@ -21,6 +22,8 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 	protected static $em;
 	
 	protected static $dbname='amhemunittest';
+	
+	protected static $entities_count=10;
 	
 	public static function setUpBeforeClass(){
 		echo PHP_EOL.'Preparing EntityManager'.PHP_EOL;
@@ -59,7 +62,7 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 		echo PHP_EOL.'testing Insertion'.PHP_EOL;
 		$emps=array();
 		$repo=self::$em->getRepository('Employee');
-		for($i=0;$i<10;$i++){
+		for($i=0;$i<self::$entities_count;$i++){
 			$emp=new Test\Employee('Employee '.($i+1), rand(1000,2000));
 			$repo->persist($emp);
 			$emps[]=$emp;
@@ -79,11 +82,40 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 			$this->assertEquals(($s=$emps[$i]->getStudent())? $s->id():$s,($s=$emps_db[$i]->getStudent())? $s->id():$s);
 		}
 	}
+	/**
+	@depends testInsert
+	*/
+	public function testSelfOneToOneRelations(){
+		echo PHP_EOL.'testing Self one to one relations'.PHP_EOL;
+		$select=new SelectStatement();
+		$select->setLimit(self::$entities_count);
+		$es=self::$em->getRepository('Employee')->findBy($select);
+		for($i=1;$i<self::$entities_count;$i++){
+			if((rand(0,100)%5)==0){
+				$mentor=$es[rand(0,$i-1)];
+				$es[$i]->setMentor($mentor);
+				echo PHP_EOL.'Employee ID='.$es[$i]->id().' now is a student of Employee ID='.$mentor->id().PHP_EOL;
+			}
+		}
+		self::$em->flush();
+		echo PHP_EOL.'loading entities from db to check if changes saved correctly'.PHP_EOL;
+		self::$em->getRepository('Employee')->getIdentityMap()->clear();
+		$es_db=self::$em->getRepository('Employee')->findBy($select);
+		$this->assertEquals(count($es),count($es_db));
+		for($i=0,$c=count($es);$i<$c;$i++){
+			$this->assertEquals(($m=$es[$i]->getMentor())? $m->id():$m,($m=$es_db[$i]->getMentor())? $m->id():$m);
+			$this->assertEquals(($s=$es[$i]->getStudent())? $s->id():$s,($s=$es_db[$i]->getStudent())? $s->id():$s);
+		}
+	}
 	
 	public function tearDown(){
 		echo PHP_EOL.'Recreating Mappers'.PHP_EOL;
 		$queries=self::$em->getRepository('Employee')->getMapper()->queriesStat();
-		echo PHP_EOL.'Queries executed on last test = '.count($queries).PHP_EOL;
+		echo PHP_EOL.'Queries count executed on last test = '.count($queries).PHP_EOL;
+		echo 'Queries:'.PHP_EOL;
+		foreach($queries as $q){
+			echo $q.PHP_EOL;
+		}
 		self::$queries=array_merge(self::$queries,$queries);
 		self::$em->getRepository('Employee')->setMapper(new Test\EmployeeMapper(self::$pdo));
 	}

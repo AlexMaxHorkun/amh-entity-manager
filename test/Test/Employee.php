@@ -121,6 +121,7 @@ class Employee extends \AMH\EntityManager\Entity\AbstractEntity{
 			if($mentor->getStudent()!==$this){
 				$mentor->setStudent($this);
 			}
+			$this->dirty();
 		}
 		else{
 			throw new \InvalidArgumentException('Cannot mentor self');
@@ -143,7 +144,7 @@ class Employee extends \AMH\EntityManager\Entity\AbstractEntity{
 		if($mentor && $mentor->getStudent()===$this){
 			$mentor->stopMentoring($this);
 		}
-		
+		$this->dirty();
 	}
 	/**
 	@throws \InvalidArgumentException If given student is this employee.
@@ -156,6 +157,7 @@ class Employee extends \AMH\EntityManager\Entity\AbstractEntity{
 			if($old_student && $old_student->getMentor()===$this){
 				$old_student->loseMentor();
 			}
+			$this->dirty();
 		}
 		else{
 			throw new \InvalidArgumentException('Cannot mentor self');
@@ -180,6 +182,7 @@ class Employee extends \AMH\EntityManager\Entity\AbstractEntity{
 			if($s->getMentor()===$this){
 				$s->loseMentor();
 			}
+			$this->dirty();
 		}
 	}
 }

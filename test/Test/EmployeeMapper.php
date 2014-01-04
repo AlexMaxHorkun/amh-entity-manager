@@ -48,34 +48,19 @@ class EmployeeMapper extends MapperQueryStat{
 		return $res;
 	}
 	
-	protected function loadEntityData($id){
-		$query='select * from employee where id='.$id;
-		$res=$this->pdo->query($query)->fetchAll();
-		$this->addQueryToStat($query);
-		if(!$res) return NULL;
-	}
-	
 	public function add(Entity $e){
-		$query='insert into employee values(NULL,:name,:salary,:mentor,:student)';
+		$query='insert into employee values(NULL,\''.$e->getName().'\','.((int)$e->getSalary()).','.(($mentor=$e->getMentor())? $mentor->id():'NULL').','
+			.(($student=$e->getStudent())? $student->id():'NULL').')';
 		$stt=$this->pdo->prepare($query);
-		$stt->bindValue('name',$e->getName());
-		$stt->bindValue('salary',(int)$e->getSalary());
-		$stt->bindValue('mentor',($mentor=$e->getMentor())? $mentor->id():NULL);
-		$stt->bindValue('student',($student=$e->getStudent())? $student->id():NULL);
 		$stt->execute();
 		$this->addQueryToStat($query);
 		return $this->pdo->lastInsertId();
 	}
 	public function update(Entity $e){
-		$query='update employee set name=\''.$e->getName().'\', salary='.$e->getSalary().', cur_task=';
-		if($e->tasks()){
-			$query.=$e->tasks()[0]->id();
-		}
-		else{
-			$query.='null';
-		}
-		$query.=' where id='.$e->id();
-		$this->pdo->query($query);
+		$query='update employee set name=\''.$e->getName().'\', salary='.$e->getSalary().', mentor='.(($e->getMentor())? $e->getMentor()->id():'NULL')
+			.', student='.(($e->getStudent())? $e->getStudent()->id():'NULL').' where id='.$e->id();
+		$stt=$this->pdo->prepare($query);
+		$stt->execute();
 		$this->addQueryToStat($query);
 	}
 	public function remove(Entity $e){
