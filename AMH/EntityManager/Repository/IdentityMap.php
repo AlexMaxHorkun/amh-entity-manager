@@ -224,13 +224,13 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	public function unitOfWork(){
 		$uow=array('add'=>array(), 'update'=>array(), 'remove'=>array());
 		foreach($this->entities as $e_data){
-			if($e_data->getFlushAction()==self::FLUSH_ACTION_INSERT){
+			if($e_data->getFlushAction()==Container::FLUSH_ACTION_INSERT){
 				$uow['add'][]=$e_data->getEntity();
 			}
-			elseif($e_data->getFlushAction()==self::FLUSH_ACTION_UPDATE){
+			elseif($e_data->getFlushAction()==Container::FLUSH_ACTION_UPDATE){
 				$uow['update'][]=$e_data->getEntity();
 			}
-			elseif($e_data->getFlushAction()==self::FLUSH_ACTION_REMOVE){
+			elseif($e_data->getFlushAction()==Container::FLUSH_ACTION_REMOVE){
 				$uow['remove'][]=$e_data->getEntity();
 			}
 		}

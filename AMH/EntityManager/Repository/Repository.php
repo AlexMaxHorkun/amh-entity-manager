@@ -232,7 +232,7 @@ class Repository{
 	@return bool On success.
 	*/
 	public function persist(AbstractEntity $e){
-		if($this->identity_map->addToMap($e,IdentityMap::FLUSH_ACTION_INSERT)){
+		if($this->mappers['identity_map']->addToMap($e,EntityContainer::FLUSH_ACTION_INSERT)){
 			return TRUE;
 		}
 		
