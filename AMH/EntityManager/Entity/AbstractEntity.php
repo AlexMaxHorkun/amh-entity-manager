@@ -75,7 +75,7 @@ abstract class AbstractEntity{
 	Marks this entity as dirty.
 	*/
 	protected function dirty(){
-		if($this->repo){
+		if($this->repo && !$this->being_loaded){
 			$this->repo->dirty($this);
 		}
 	}
