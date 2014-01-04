@@ -94,5 +94,9 @@ abstract class AbstractEntity{
 		
 		return TRUE;
 	}
+	
+	public function setLoaded($is=TRUE){
+		$this->loaded=(bool)$is;
+	}
 }
 ?>
