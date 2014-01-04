@@ -37,7 +37,7 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 			self::$pdo->query('create database '.self::$dbname);
 		}
 		catch(\Exception $e){
-			echo PH_EOL.'Already exists'.PHP_EOL;
+			echo PHP_EOL.'Already exists'.PHP_EOL;
 		}
 		self::$pdo->query('use '.self::$dbname);
 		echo PHP_EOL.'Creating tables'.PHP_EOL;
@@ -75,8 +75,8 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 		for($i=0,$c=count($emps);$i<$c;$i++){
 			$this->assertEquals($emps[$i]->getName(),$emps_db[$i]->getName());
 			$this->assertEquals($emps[$i]->getSalary(),$emps_db[$i]->getSalary());
-			$this->assertEquals($emps[$i]->getMentor(),$emps_db[$i]->getMentor());
-			$this->assertEquals($emps[$i]->getStudent(),$emps_db[$i]->getStudent());
+			$this->assertEquals(($m=$emps[$i]->getMentor())? $m->id():$m,($m=$emps_db[$i]->getMentor())? $m->id():$m);
+			$this->assertEquals(($s=$emps[$i]->getStudent())? $s->id():$s,($s=$emps_db[$i]->getStudent())? $s->id():$s);
 		}
 	}
 	

@@ -316,6 +316,49 @@ class Repository{
 		return FALSE;
 	}
 	/**
+	Inserts entity.
+	
+	@return void
+	*/
+	protected function flushInsert(AbstractEntity $e){
+		if(!$this->mappers['database']){
+			throw new \RuntimeException('No db mapper set');
+		}
+		if($this->getIdentityMap()->flushAction($e)==EntityContainer::FLUSH_ACTION_INSERT){
+			$e->setId($this->mappers['database']->add($e));
+			$this->mappers['identity_map']->clearFlushAction($e);
+		}
+	}
+	/**
+	Updates entity.
+	
+	@return void
+	*/
+	protected function flushUpdate(AbstractEntity $e){
+		if(!$this->mappers['database']){
+			throw new \RuntimeException('No db mapper set');
+		}
+		if($this->getIdentityMap()->flushAction($e)==EntityContainer::FLUSH_ACTION_UPDATE){
+			$this->mappers['database']->update($e);
+			$this->mappers['identity_map']->clearFlushAction($e);
+		}
+	}
+	/**
+	Removes entity.
+	
+	@return void
+	*/
+	protected function flushRemove(AbstractEntity $e){
+		if(!$this->mappers['database']){
+			throw new \RuntimeException('No db mapper set');
+		}
+		if($this->getIdentityMap()->flushAction($e)==EntityContainer::FLUSH_ACTION_UPDATE){
+			$this->mappers['database']->remove($e);
+			$this->mappers['identity_map']->clearFlushAction($e);
+			$this->untrack($e);
+		}
+	}
+	/**
 	Saves changes done to entities.
 	
 	@return void
@@ -324,27 +367,15 @@ class Repository{
 		if(!$this->mappers['database']){
 			throw new \RuntimeException('Can\'t do shit without mapper');
 		}
-		
-		$uow=$this->mappers['identity_map']->unitOfWork();
-		foreach($uow['add'] as $e){
-			$id=(int)$this->mappers['database']->add($e);
-			if($id>=0){
-				$e->setId($id);
-			}
-			else{
-				throw new \RuntimeException('Mapper '.get_class($this->mappers['database']).'::add did not return new Entity\'s ID');
-			}
+		while($e=$this->getIdentityMap()->nextEntityToRemove()){
+			$this->flushRemove($e);
 		}
-		foreach($uow['update'] as $e){
-			$this->mappers['database']->update($e);
-		}
-		foreach($uow['remove'] as $e){
-			if($e->id()){
-				$this->mappers['database']->remove($e);
-			}
-			$this->mappers['identity_map']->remove($e);
-		}
-		$this->mappers['identity_map']->clearUnitOfWork();
+		while($e=$this->getIdentityMap()->nextEntityToInsert()){
+			$this->flushInsert($e);
+		}	
+		while($e=$this->getIdentityMap()->nextEntityToUpdate()){
+			$this->flushUpdate($e);
+		}	
 	}
 }
 ?>

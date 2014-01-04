@@ -219,29 +219,63 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 		return FALSE;
 	}
 	/**
-	@return array List of entities to add, update or remove.
+	Gets an Entity to be inserted.
+	
+	@return Entity
 	*/
-	public function unitOfWork(){
-		$uow=array('add'=>array(), 'update'=>array(), 'remove'=>array());
-		foreach($this->entities as $e_data){
-			if($e_data->getFlushAction()==Container::FLUSH_ACTION_INSERT){
-				$uow['add'][]=$e_data->getEntity();
-			}
-			elseif($e_data->getFlushAction()==Container::FLUSH_ACTION_UPDATE){
-				$uow['update'][]=$e_data->getEntity();
-			}
-			elseif($e_data->getFlushAction()==Container::FLUSH_ACTION_REMOVE){
-				$uow['remove'][]=$e_data->getEntity();
+	public function nextEntityToInsert(){
+		foreach($this->entities as $e_cont){
+			if($e_cont->getFlushAction()==Container::FLUSH_ACTION_INSERT){
+				return $e_cont->getEntity();
 			}
 		}
-		return $uow;
+		
+		return NULL;
+	}
+	/**
+	Gets an entity to update.
+	
+	@return Entity
+	*/
+	public function nextEntityToUpdate(){
+		foreach($this->entities as $e_cont){
+			if($e_cont->getFlushAction()==Container::FLUSH_ACTION_UPDATE){
+				return $e_cont->getEntity();
+			}
+		}
+		
+		return NULL;
+	}
+	/**
+	Gets an entity to delete.
+	
+	@return Entity
+	*/
+	public function nextEntityToRemove(){
+		foreach($this->entities as $e_cont){
+			if($e_cont->getFlushAction()==Container::FLUSH_ACTION_REMOVE){
+				return $e_cont->getEntity();
+			}
+		}
+		
+		return NULL;
+	}
+	/**
+	Clears flush action for an entity.
+	
+	@return void
+	*/
+	public function clearFlushAction(Entity $e){
+		if(($ind=$this->indexOf($e))!=-1){
+			$this->entities[$ind]->setFlushAction(Container::FLUSH_ACTION_NONE);
+		}
 	}
 	/**
 	Clears unit of work (sets action param to NONE).
 	
 	@return void
 	*/
-	public function clearUnitOfWork(){
+	public function clearAllFlushActions(){
 		foreach($this->entities as $key=>$e_data){
 			$this->entities[$key]->setFlushAction(Container::FLUSH_ACTION_NONE);
 		}

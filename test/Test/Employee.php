@@ -113,15 +113,14 @@ class Employee extends \AMH\EntityManager\Entity\AbstractEntity{
 	public function setMentor(Employee $mentor){
 		$this->load();
 		if($this!==$mentor){
-			if($mentor->getStudent()!==$this){
-				$mentor->setStudent($this);
-			}
 			$old_mentor=$this->mentor;
-			$this->mentor=$mentor;
 			if($old_mentor && $old_mentor->getStudent()===$this){
 				$old_mentor->stopMentoring($this);
 			}
-			
+			$this->mentor=$mentor;
+			if($mentor->getStudent()!==$this){
+				$mentor->setStudent($this);
+			}
 		}
 		else{
 			throw new \InvalidArgumentException('Cannot mentor self');
