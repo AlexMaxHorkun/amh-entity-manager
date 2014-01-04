@@ -237,7 +237,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 		return $uow;
 	}
 	/**
-	Clears unit of work (sets acton param to NONE).
+	Clears unit of work (sets action param to NONE).
 	
 	@return void
 	*/
@@ -245,6 +245,14 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 		foreach($this->entities as $key=>$e_data){
 			$this->entities[$key]->setFlushAction(Container::FLUSH_ACTION_NONE);
 		}
+	}
+	/**
+	Clears entity array.
+	
+	@return void
+	*/
+	public function clear(){
+		$this->entities=array();
 	}
 	
 	//ArrayAccess
