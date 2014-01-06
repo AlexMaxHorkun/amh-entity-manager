@@ -195,10 +195,9 @@ class Repository{
 			}
 			$ids=array();
 			foreach($found as $e){
-				if(!$e->id()){
-					throw new \RuntimeException('Entity returned from mapper '.get_class($m).' has no ID');
+				if($e->id()){
+					$ids[]=$e->id();
 				}
-				$ids[]=$e->id();
 			}
 			$select->setNotInIds($ids);			
 		}
