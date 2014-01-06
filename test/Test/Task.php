@@ -40,9 +40,7 @@ class Task extends \AMH\EntityManager\Entity\AbstractEntity{
 		$name=(string)$name;
 		if(mb_strlen($name)>0){
 			$this->name=$name;
-			if($this->getRepository(){
-				$this->dirty();
-			}
+			$this->dirty();
 		}
 		else{
 			throw new \InvalidArgumentException('Invalid name given, string with length greater then 0 expected');
@@ -52,19 +50,19 @@ class Task extends \AMH\EntityManager\Entity\AbstractEntity{
 	@return string
 	*/
 	public function getName(){
+		$this->load();
 		return $this->name;
 	}
 	
 	public function setCompleteTime(\DateTime $d){
 		$this->tobedone_time=$d;
-		if($this->getRepository(){
-			$this->dirty();
-		}
+		$this->dirty();
 	}
 	/**
 	@return \DateTime
 	*/
 	public function getCompleteTime(){
+		$this->load();
 		return $this->tobedone_time;
 	}
 	/**
@@ -91,6 +89,7 @@ class Task extends \AMH\EntityManager\Entity\AbstractEntity{
 	@return array Of Employee.
 	*/
 	public function assigned(){
+		$this->load();
 		return $this->emps;
 	}
 	/**
@@ -101,12 +100,14 @@ class Task extends \AMH\EntityManager\Entity\AbstractEntity{
 		foreach($this->emps as $e){
 			$e->removeTask($this);
 		}
+		$this->dirty();
 		return TRUE;
 	}
 	/**
 	@return bool If was completed.
 	*/
 	public function isCompleted(){
+		$this->load();
 		return $this->completed;
 	}
 }

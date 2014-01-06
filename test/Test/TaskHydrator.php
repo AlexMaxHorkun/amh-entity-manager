@@ -2,22 +2,27 @@
 namespace Test;
 
 class EmployeeHydrator extends \AMH\EntityManager\Entity\Hydrator\AbstractHydrator{
-	public function create(){
-		return new Employee();
+	public function newEntity(){
+		return new Task();
 	}
 	
 	public function hydrate(\AMH\EntityManager\Entity\AbstractEntity $e, array $data){
 		if(isset($data['name'])) $e->setName($data['name']);
-		if(isset($data['salary'])) $e->setSalary($data['salary']);
-		if(isset($data['task']) && $data['task']) $e->addTask($data['task']);
-		if(isset($data['id'])) $e->setId($data['id']);
+		if(isset($data['complete_time'])) $e->setCompleteTime(new \DateTime($data['complete_time']));
+		if(isset($data['completed']) && $data['completed']) $e->complete();
+		if(isset($data['emps'])) $e->assignAll($this->relatives($data['emps']));
 	}
 	
 	public function extract(\AMH\EntityManager\Entity\AbstractEntity $e){
+		$emps=$e->assigned();
+		foreach($emps as $key=>$emp){
+			$emps[$key]=$emp->id();
+		}
 		return array(
 			'name'=>$e->getName(),
-			'salary'=>$e->getSalary(),
-			'task'=>($ts=$e->tasks())? $ts[0]:NULL
+			'complete_time'=>$e->getCompleteTime()->format('Y-m-d H:i:s'),
+			'completed'=>(bool)$e->isCompleted(),
+			'emps'=>$emps
 		);
 	}
 }
