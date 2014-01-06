@@ -41,12 +41,6 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	/**
 	@return array of Entity.
 	*/
-	public function find(SelSttm $select){
-		return $this->findEntities($select);
-	}
-	/**
-	@return array of Entity.
-	*/
 	protected function findEntities(SelSttm $select){
 		$found=array();
 		foreach($this->entities as $e_cont){
@@ -63,11 +57,19 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 				$found[]=$e_cont->getEntity();
 			}
 			
-			if($select->getLimit()<=count($found)){
+			if($select->getLimit() && $select->getLimit()<=count($found)){
 				break;
 			}
 		}	
 		return $found;
+	}
+	/**
+	Just returns findEntities result.
+	
+	@return array of Entity.
+	*/
+	protected function fetchEntities(array $data){
+		return $data;
 	}
 	
 	public function add(Entity $e){
@@ -174,7 +176,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 			return $e_cont->getEntity();
 		}
 		else{
-			throw new \RuntimeException('Cannot add existing entity to identity map');
+			throw new \RuntimeException('Cannot add existing entity (ID='.(($e instanceof Entity)? $e->id():$this->getHydrator()->extractId($e)).') to identity map');
 		}
 	}
 	/**
