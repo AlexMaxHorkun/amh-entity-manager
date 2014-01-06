@@ -252,7 +252,7 @@ class Repository{
 	Removes entity (identity map marks it's flush action as remove).
 	*/
 	public function remove(AbstractEntity $e){
-		$this->identity_map->remove($e);
+		$this->mappers['identity_map']->remove($e);
 	}
 	/**
 	Untracks entity object.
