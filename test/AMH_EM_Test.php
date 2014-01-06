@@ -107,6 +107,21 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 			$this->assertEquals(($s=$es[$i]->getStudent())? $s->id():$s,($s=$es_db[$i]->getStudent())? $s->id():$s);
 		}
 	}
+	/**
+	@depends testSelfOneToOneRelations
+	*/
+	public function testRemove(){
+		$repo=self::$em->getRepository('Employee');
+		$es=$repo->findAll();
+		echo PHP_EOL.'Testing Entity remove'.PHP_EOL;
+		$e=$es[rand(0,count($es)-1)];
+		echo PHP_EOL.'Removing Entity ID='.$e->id().PHP_EOL;
+		$repo->remove($e);
+		$repo->flush();
+		echo PHP_EOL.'Getting Entity list to check if entity removed'.PHP_EOL;
+		$es=$repo->findAll();
+		$this->assertFalse(in_array($e,$es));
+	}
 	
 	public function tearDown(){
 		echo PHP_EOL.'Recreating Mappers'.PHP_EOL;

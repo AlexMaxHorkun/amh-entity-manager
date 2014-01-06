@@ -65,7 +65,13 @@ class EmployeeMapper extends MapperQueryStat{
 	}
 	public function remove(Entity $e){
 		$query='delete from employee where id='.$e->id();
-		$this->pdo->query($query)->execute();
+		$this->pdo->query($query);
+		$this->addQueryToStat($query);
+		$query='update employee set mentor=NULL where mentor='.$e->id();
+		$this->pdo->query($query);
+		$this->addQueryToStat($query);
+		$query='update employee set student=NULL where student='.$e->id();
+		$this->pdo->query($query);
 		$this->addQueryToStat($query);
 	}
 }
