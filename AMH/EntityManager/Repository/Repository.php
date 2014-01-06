@@ -352,10 +352,10 @@ class Repository{
 		if(!$this->mappers['database']){
 			throw new \RuntimeException('No db mapper set');
 		}
-		if($this->getIdentityMap()->flushAction($e)==EntityContainer::FLUSH_ACTION_UPDATE){
+		if($this->getIdentityMap()->flushAction($e)==EntityContainer::FLUSH_ACTION_REMOVE){
 			$this->mappers['database']->remove($e);
-			$this->mappers['identity_map']->clearFlushAction($e);
 			$this->untrack($e);
+			$this->mappers['identity_map']->clearFlushAction($e);
 		}
 	}
 	/**
