@@ -165,6 +165,7 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 	public function tearDown(){
 		echo PHP_EOL.'Recreating Mappers'.PHP_EOL;
 		$queries=self::$em->getRepository('Employee')->getMapper()->queriesStat();
+		$queries=array_merge($queries,self::$em->getRepository('Task')->getMapper()->queriesStat());
 		echo PHP_EOL.'Queries count executed on last test = '.count($queries).PHP_EOL;
 		echo 'Queries:'.PHP_EOL;
 		foreach($queries as $q){
@@ -172,6 +173,7 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 		}
 		self::$queries=array_merge(self::$queries,$queries);
 		self::$em->getRepository('Employee')->setMapper(new Test\EmployeeMapper(self::$pdo));
+		self::$em->getRepository('Task')->setMapper(new Test\TaskMapper(self::$pdo));
 	}
 	
 	public static function tearDownAfterClass(){

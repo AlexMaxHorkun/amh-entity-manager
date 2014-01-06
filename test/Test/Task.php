@@ -23,9 +23,10 @@ class Task extends \AMH\EntityManager\Entity\AbstractEntity{
 	@param \DateTime|null $dt Complete time.
 	@param Employee|null $emp Assigned employee.
 	*/
-	public function __costruct($name=NULL, \DateTime $dt=NULL, array $emps=array()){
-		if($name)
+	public function __construct($name=NULL, \DateTime $dt=NULL, array $emps=array()){
+		if($name){
 			$this->setName($name);
+		}
 		if(!$dt){
 			$dt=new \DateTime();
 		}
