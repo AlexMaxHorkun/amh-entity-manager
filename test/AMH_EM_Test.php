@@ -12,6 +12,9 @@ include_once 'Test/Employee.php';
 include_once 'Test/EmployeeHydrator.php';
 include_once 'Test/MapperQueryStat.php';
 include_once 'Test/EmployeeMapper.php';
+include_once 'Test/Task.php';
+include_once 'Test/TaskHydrator.php';
+include_once 'Test/TaskMapper.php';
 use AMH\EntityManager\Repository\Mapper\SelectStatement;
 
 class AMH_EM_Test extends PHPUnit_Framework_TestCase{
@@ -35,6 +38,7 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 		$employee_mapper=new Test\EmployeeMapper(self::$pdo);
 		$employee_rep->setMapper($employee_mapper);
 		$employee_rep->setEntityManager(self::$em);
+		self::$em->addRepository(new \AMH\EntityManager\Repository\Repository('Task',new Test\TaskHydrator(),new Test\TaskMapper(self::$pdo)));
 		echo PHP_EOL.'Creating database '.self::$dbname.PHP_EOL;
 		try{
 			self::$pdo->query('create database '.self::$dbname);
@@ -51,6 +55,16 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 				salary int not null,
 				mentor int,
 				student int
+			)engine=innodb default charset=utf8');
+			self::$pdo->query('create table task(
+				id int not null auto_increment primary key,
+				name varchar(255) not null,
+				complete tinyint not null default 0,
+				complete_time datetime
+			)engine=innodb default charset=utf8');
+			self::$pdo->query('create table emp_task(
+				employee int not null,
+				task int not null
 			)engine=innodb default charset=utf8');
 		}
 		catch(\Exception $e){
@@ -121,6 +135,31 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 		echo PHP_EOL.'Getting Entity list to check if entity removed'.PHP_EOL;
 		$es=$repo->findAll();
 		$this->assertFalse(in_array($e,$es));
+	}
+	/**
+	@depends testRemove
+	*/
+	public function testTaskInsert(){
+		echo PHP_EOL.'Inserting entities for many to many relations test'.PHP_EOL;
+		$repo=self::$em->getRepository('Task');
+		$es=array();
+		for($i=0,$c=self::$entities_count*3;$i<$c;$i++){
+			$t=new Test\Task('Task '.($i+1),new \DateTime('+ '.($i+1).' days'));
+			if(rand(0,3)==3){
+				$t->complete();
+			}
+			$es[]=$t;
+			$repo->persist($t);
+		}
+		$repo->flush();
+		$repo->getIdentityMap()->clear();
+		$es_db=$repo->findAll();
+		$this->assertEquals(count($es),count($es_db));
+		for($i=0,$c=count($es);$i<$c;$i++){
+			$this->assertEquals($es[$i]->getName(),$es_db[$i]->getName());
+			$this->assertEquals($es[$i]->getCompleteTime(),$es_db[$i]->getCompleteTime());
+			$this->assertEquals($es[$i]->isCompleted(),$es_db[$i]->isCompleted());
+		}
 	}
 	
 	public function tearDown(){

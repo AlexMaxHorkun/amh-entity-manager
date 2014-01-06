@@ -45,6 +45,22 @@ class EmployeeMapper extends MapperQueryStat{
 		}
 		$this->addQueryToStat($query);
 		$res=$this->pdo->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+		$ids=array();
+		foreach($res as $key=>$row){
+			$res[$key]['tasks']=array();
+			$ids[]=$row['id'];
+		}
+		if($ids){
+			$query='select * from emp_task where employee in ('.implode($ids,',').')';
+			$tasks=$this->pdo->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+			foreach($res as $key=>$row){
+				foreach($tasks as $t){
+					if($t['employee']==$row['id']){
+						$res[$key]['tasks'][]=$t['task'];
+					}
+				}
+			}
+		}
 		return $res;
 	}
 	
@@ -54,7 +70,17 @@ class EmployeeMapper extends MapperQueryStat{
 		$stt=$this->pdo->prepare($query);
 		$stt->execute();
 		$this->addQueryToStat($query);
-		return $this->pdo->lastInsertId();
+		$id=$this->pdo->lastInsertId();
+		if($tasks=$e->tasks()){
+			foreach($tasks as $t){
+				if($t->id()){
+					$query='insert into emp_task values('.$id.','.$t->id().')';
+					$this->pdo->query($query);
+					$this->addQueryToStat($query);
+				}
+			}
+		}
+		return $id;
 	}
 	public function update(Entity $e){
 		$query='update employee set name=\''.$e->getName().'\', salary='.$e->getSalary().', mentor='.(($e->getMentor())? $e->getMentor()->id():'NULL')
@@ -62,6 +88,18 @@ class EmployeeMapper extends MapperQueryStat{
 		$stt=$this->pdo->prepare($query);
 		$stt->execute();
 		$this->addQueryToStat($query);
+		$query='delete from emp_task where employee='.$e->id();
+		$this->pdo->query($query);
+		$this->addQueryToStat($query);
+		if($tasks=$e->tasks()){
+			foreach($tasks as $t){
+				if($t->id()){
+					$query='insert into emp_task values('.$e->id().','.$t->id().')';
+					$this->pdo->query($query);
+					$this->addQueryToStat($query);
+				}
+			}
+		}
 	}
 	public function remove(Entity $e){
 		$query='delete from employee where id='.$e->id();
@@ -71,6 +109,9 @@ class EmployeeMapper extends MapperQueryStat{
 		$this->pdo->query($query);
 		$this->addQueryToStat($query);
 		$query='update employee set student=NULL where student='.$e->id();
+		$this->pdo->query($query);
+		$this->addQueryToStat($query);
+		$query='delete from emp_task where employee='.$e->id();
 		$this->pdo->query($query);
 		$this->addQueryToStat($query);
 	}

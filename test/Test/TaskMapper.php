@@ -3,7 +3,7 @@ namespace Test;
 
 use AMH\EntityManager\Entity\AbstractEntity as Entity;
 
-class EmployeeMapper extends MapperQueryStat{
+class taskMapper extends MapperQueryStat{
 	protected $pdo=NULL;
 	
 	public function __construct(\PDO $p){
@@ -12,7 +12,7 @@ class EmployeeMapper extends MapperQueryStat{
 	}
 	
 	protected function findEntities(\AMH\EntityManager\Repository\Mapper\SelectStatement $s){
-		$query='select * from employee';
+		$query='select * from task';
 		$where=array();
 		if($s->getIds()){
 			$where[]='id in ('.implode($s->getIds(),',').')';
@@ -24,11 +24,14 @@ class EmployeeMapper extends MapperQueryStat{
 			if(isset($filter['name'])){
 				$where[]='name=\''.$filter['name'].'\'';
 			}
-			if(isset($filter['salary'])){
-				$where[]='salary='.$filter['salary'];
+			if(isset($filter['complete'])){
+				$where[]='complete='.(($filter['complete'])? 1:0);
 			}
-			if(isset($filter['task'])){
-				$where[]='task='.(($filter['task'] instanceof Entity)? $filter['task']->id() : (int)$filter['task']);
+			if(isset($filter['employee'])){
+				$where[]='count(select * from emp_task where employee='.((int)$filter['employee']).' and task=id limit 1)>0';
+			}
+			if(isset($filter['employees']) && is_array($filter['employees']) && $filter['employees']){
+				$where[]='count(select * from emp_task where employee in ('.implode($filter['employees'],',').') and task=id limit 1)='.count($filter['employees']);
 			}
 		}
 		if($where){
@@ -39,45 +42,67 @@ class EmployeeMapper extends MapperQueryStat{
 		}
 		$this->addQueryToStat($query);
 		$res=$this->pdo->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+		$ids=array();
 		foreach($res as $key=>$row){
-			$res[$key]['task']=$row['cur_task'];
-			unset($res[$key]['cur_task']);
+			$ids[]=$row['id'];
+			$res[$key]['emps']=array();
+		}
+		if($ids){
+			$query='select * from emp_task where task in ('.implode($ids,',').')';
+			$emps=$this->pdo->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+			$this->addQueryToStat($query);
+			foreach($res as $key=>$row){
+				foreach($emps as $emp){
+					if($emp['task']==$row['id']){
+						$res[$key]['emps'][]=$emp['employee'];
+					}
+				}
+			}
 		}
 		return $res;
 	}
 	
-	protected function loadEntityData($id){
-		$query='select * from employee where id='.$id;
-		$res=$this->pdo->query($query)->fetchAll();
-		$this->addQueryToStat($query);
-		if(!$res) return NULL;
-	}
-	
 	public function add(Entity $e){
-		$query='insert into employee values(NULL,:name,:salary,:task)';
-		$stt=$this->pdo->prepare($query);
-		$stt->bindValue('name',$e->getName());
-		$stt->bindValue('salary',(int)$e->getSalary());
-		$stt->bindValue('task',($tasks=$e->tasks())? $tasks[0]:NULL);
-		$stt->execute();
-		$this->addQueryToStat($query);
-		return $this->pdo->lastInsertId();
-	}
-	public function update(Entity $e){
-		$query='update employee set name=\''.$e->getName().'\', salary='.$e->getSalary().', cur_task=';
-		if($e->tasks()){
-			$query.=$e->tasks()[0]->id();
-		}
-		else{
-			$query.='null';
-		}
-		$query.=' where id='.$e->id();
+		$query='insert into task values(NULL,\''.$e->getName().'\','.(($e->isCompleted())? 1:0).',\''.$e->getCompleteTime()->format('Y-m-d H:i:s').'\')';
 		$this->pdo->query($query);
 		$this->addQueryToStat($query);
+		$id=$this->pdo->lastInsertId();
+		if($emps=$e->assigned()){
+			$queries=array();
+			foreach($emps as $key=>$emp){
+				if($emps->id()){
+					$query='insert into emp_task values('.$emp->id().','.$id.')';
+					$this->pdo->query($query);
+					$this->addQueryToStat($query);
+				}
+			}
+		}
+		return $id;
+	}
+	public function update(Entity $e){
+		$query='update task set name=\''.$e->getName().'\', complete='.(($e->isCompleted())? 1:0).', complete_time=\''.$e->getCompleteTime()->format('Y-m-d H:i:s').'\'';
+		$this->pdo->query($query);
+		$this->addQueryToStat($query);
+		$query='delete from emp_task where task='.$e->id();
+		$this->pdo->query($query);
+		$this->addQueryToStat($query);
+		if($emps=$e->assigned()){
+			$queries=array();
+			foreach($emps as $key=>$emp){
+				if($emps->id()){
+					$query='insert into emp_task values('.$emp->id().','.$e->id().')';
+					$this->pdo->query($query);
+					$this->addQueryToStat($query);
+				}
+			}
+		}
 	}
 	public function remove(Entity $e){
-		$query='delete from employee where id='.$e->id();
+		$query='delete from task where id='.$e->id();
 		$this->pdo->query($query)->execute();
+		$this->addQueryToStat($query);
+		$query='delete from emp_task where task='.$e->id();
+		$this->pdo->query($query);
 		$this->addQueryToStat($query);
 	}
 }

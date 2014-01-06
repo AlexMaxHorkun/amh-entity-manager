@@ -26,9 +26,10 @@ class Task extends \AMH\EntityManager\Entity\AbstractEntity{
 	public function __costruct($name=NULL, \DateTime $dt=NULL, array $emps=array()){
 		if($name)
 			$this->setName($name);
-		if($dt){
-			$this->setCompleteTime($dt);
+		if(!$dt){
+			$dt=new \DateTime();
 		}
+		$this->setCompleteTime($dt);
 		if($emps){
 			$this->assignAll($emps);
 		}

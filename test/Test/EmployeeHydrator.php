@@ -9,11 +9,11 @@ class EmployeeHydrator extends \AMH\EntityManager\Entity\Hydrator\AbstractHydrat
 	public function hydrate(\AMH\EntityManager\Entity\AbstractEntity $e, array $data){
 		if(isset($data['name'])) $e->setName($data['name']);
 		if(isset($data['salary'])) $e->setSalary($data['salary']);
-		/*if(isset($data['tasks']) && $data['tasks']){
+		if(isset($data['tasks']) && $data['tasks']){
 			foreach($data['tasks'] as $t){
 				$e->addTask($this->relative('Task',$t));
 			}
-		}*/
+		}
 		if(isset($data['mentor']) && $data['mentor']){
 			$e->setMentor($this->relative('Employee',$data['mentor']));
 		}
@@ -24,10 +24,14 @@ class EmployeeHydrator extends \AMH\EntityManager\Entity\Hydrator\AbstractHydrat
 	}
 	
 	public function extract(\AMH\EntityManager\Entity\AbstractEntity $e){
+		$tasks=$e->tasks();
+		foreach($tasks as $key=>$t){
+			$tasks[$key]=$t->id();
+		}
 		return array(
 			'name'=>$e->getName(),
 			'salary'=>$e->getSalary(),
-			'tasks'=>$e->tasks(),
+			'tasks'=>$tasks,
 			'mentor'=>($e->getMentor())? $e->getMentor()->id():NULL,
 			'student'=>($e->getStudent())? $e->getStudent()->id():NULL,
 		);

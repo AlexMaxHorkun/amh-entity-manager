@@ -1,7 +1,7 @@
 <?php
 namespace Test;
 
-class EmployeeHydrator extends \AMH\EntityManager\Entity\Hydrator\AbstractHydrator{
+class TaskHydrator extends \AMH\EntityManager\Entity\Hydrator\AbstractHydrator{
 	public function newEntity(){
 		return new Task();
 	}
