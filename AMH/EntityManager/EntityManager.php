@@ -69,6 +69,7 @@ class EntityManager{
 			return;
 		}
 		$this->repos[$repo->getName()]=$repo;
+		$repo->setEntityManager($this);
 	}
 	/**
 	@param string Name of repo needed.
