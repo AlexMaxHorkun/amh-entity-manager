@@ -97,7 +97,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 	*/
 	public function remove(Entity $e){
 		if(($ind=$this->indexOf($e))&&$ind!=-1){
-			$this->entities[$ind]->setAction(Container::FLUSH_ACTION_REMOVE);
+			$this->entities[$ind]->setFlushAction(Container::FLUSH_ACTION_REMOVE);
 		}
 		else{
 			$this->addToMap($e,Container::FLUSH_ACTION_REMOVE);
