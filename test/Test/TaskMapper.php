@@ -89,7 +89,7 @@ class taskMapper extends MapperQueryStat{
 		if($emps=$e->assigned()){
 			$queries=array();
 			foreach($emps as $key=>$emp){
-				if($emps->id()){
+				if($emp->id()){
 					$query='insert into emp_task values('.$emp->id().','.$e->id().')';
 					$this->pdo->query($query);
 					$this->addQueryToStat($query);

@@ -156,9 +156,41 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 		$es_db=$repo->findAll();
 		$this->assertEquals(count($es),count($es_db));
 		for($i=0,$c=count($es);$i<$c;$i++){
+			$this->assertEquals($es[$i]->id(),$es_db[$i]->id());
 			$this->assertEquals($es[$i]->getName(),$es_db[$i]->getName());
 			$this->assertEquals($es[$i]->getCompleteTime(),$es_db[$i]->getCompleteTime());
 			$this->assertEquals($es[$i]->isCompleted(),$es_db[$i]->isCompleted());
+		}
+	}
+	/**
+	@depends testTaskInsert
+	*/
+	public function testManyToMany(){
+		echo PHP_EOL.'Testing many to many relations'.PHP_EOL;
+		$emps=self::$em->getRepository('Employee')->findAll();
+		$tasks=self::$em->getRepository('Task')->findAll();
+		foreach($tasks as $t){
+			for($i=0,$c=rand(1,self::$entities_count);$i<$c;$i++){
+				$emp=$emps[rand(0,count($emps)-1)];
+				echo PHP_EOL.'Assigning Employee ID='.$emp->id().' for Task ID='.$t->id().PHP_EOL;
+				$t->assign($emp);
+			}
+		}
+		self::$em->flush();
+		echo PHP_EOL.'Loading entities from DB to check if they are saved correctly'.PHP_EOL;
+		self::$em->getRepository('Employee')->getIdentityMap()->clear();
+		self::$em->getRepository('Task')->getIdentityMap()->clear();
+		$emps_db=self::$em->getRepository('Employee')->findAll();
+		$this->assertEquals(count($emps),count($emps_db));
+		for($i=0,$c=count($emps);$i<$c;$i++){
+			$this->assertEquals($emps[$i]->id(),$emps_db[$i]->id());
+			$ts=$emps[$i]->tasks();
+			$ts_db=$emps_db[$i]->tasks();
+			$this->assertEquals(count($ts),count($ts_db));
+			for($j=0,$ct=count($ts);$j<$ct;$j++){
+				$this->assertEquals($ts[$i]->id(),$ts_db[$i]->id());
+				$this->assertEquals($ts[$i]->getName(),$ts_db[$i]->getName());
+			}
 		}
 	}
 	
