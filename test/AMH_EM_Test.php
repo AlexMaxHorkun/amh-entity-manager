@@ -188,6 +188,7 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 			$ts_db=$emps_db[$i]->tasks();
 			$this->assertEquals(count($ts),count($ts_db));
 			for($j=0,$ct=count($ts);$j<$ct;$j++){
+				$this->assertTrue($ts_db[$i] instanceof Test\Task);
 				$this->assertEquals($ts[$i]->id(),$ts_db[$i]->id());
 				$this->assertEquals($ts[$i]->getName(),$ts_db[$i]->getName());
 			}
@@ -199,10 +200,10 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 		$queries=self::$em->getRepository('Employee')->getMapper()->queriesStat();
 		$queries=array_merge($queries,self::$em->getRepository('Task')->getMapper()->queriesStat());
 		echo PHP_EOL.'Queries count executed on last test = '.count($queries).PHP_EOL;
-		echo 'Queries:'.PHP_EOL;
+		/*echo 'Queries:'.PHP_EOL;
 		foreach($queries as $q){
 			echo $q.PHP_EOL;
-		}
+		}*/
 		self::$queries=array_merge(self::$queries,$queries);
 		self::$em->getRepository('Employee')->setMapper(new Test\EmployeeMapper(self::$pdo));
 		self::$em->getRepository('Task')->setMapper(new Test\TaskMapper(self::$pdo));
