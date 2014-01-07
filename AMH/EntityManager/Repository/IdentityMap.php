@@ -176,7 +176,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 			return $e_cont->getEntity();
 		}
 		else{
-			throw new \RuntimeException('Cannot add existing entity (ID='.(($e instanceof Entity)? $e->id():$this->getHydrator()->extractId($e)).') to identity map');
+			throw new \RuntimeException('Cannot add existing entity (ID='.(($e instanceof Entity)? $e->id():$this->getHydrator()->extractId($e)).', '.$this->getRepository()->getName().') to identity map');
 		}
 	}
 	/**
