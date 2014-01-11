@@ -64,7 +64,8 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 			)engine=innodb default charset=utf8');
 			self::$pdo->query('create table emp_task(
 				employee int not null,
-				task int not null
+				task int not null,
+				unique key(employee,task)
 			)engine=innodb default charset=utf8');
 		}
 		catch(\Exception $e){
@@ -177,6 +178,7 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 			}
 		}
 		self::$em->flush();
+		
 		echo PHP_EOL.'Loading entities from DB to check if they are saved correctly'.PHP_EOL;
 		self::$em->getRepository('Employee')->getIdentityMap()->clear();
 		self::$em->getRepository('Task')->getIdentityMap()->clear();

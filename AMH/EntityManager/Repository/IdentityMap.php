@@ -114,7 +114,7 @@ class IdentityMap extends Mapper implements \ArrayAccess{
 		}
 		foreach($this->entities as $key=>$data){
 			if($e instanceof Entity){
-				if($e===$data->getEntity()){
+				if(($e->id() && $e->id()==$data->getEntity()->id()) || (!$e->id() && $e===$data->getEntity())){
 					return $key;
 				}
 			}

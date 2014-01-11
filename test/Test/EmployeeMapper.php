@@ -61,6 +61,9 @@ class EmployeeMapper extends MapperQueryStat{
 				}
 			}
 		}
+		foreach($res as $key=>$row){
+			echo PHP_EOL.'Employee ID='.$row['id'].' tasks=['.implode($row['tasks'],',').']'.PHP_EOL;
+		}
 		return $res;
 	}
 	
@@ -71,7 +74,7 @@ class EmployeeMapper extends MapperQueryStat{
 		$stt->execute();
 		$this->addQueryToStat($query);
 		$id=$this->pdo->lastInsertId();
-		if($tasks=$e->tasks()){
+		/*if($tasks=$e->tasks()){
 			foreach($tasks as $t){
 				if($t->id()){
 					$query='insert into emp_task values('.$id.','.$t->id().')';
@@ -79,7 +82,7 @@ class EmployeeMapper extends MapperQueryStat{
 					$this->addQueryToStat($query);
 				}
 			}
-		}
+		}*/
 		return $id;
 	}
 	public function update(Entity $e){
@@ -88,7 +91,7 @@ class EmployeeMapper extends MapperQueryStat{
 		$stt=$this->pdo->prepare($query);
 		$stt->execute();
 		$this->addQueryToStat($query);
-		$query='delete from emp_task where employee='.$e->id();
+		/*$query='delete from emp_task where employee='.$e->id();
 		$this->pdo->query($query);
 		$this->addQueryToStat($query);
 		if($tasks=$e->tasks()){
@@ -99,7 +102,7 @@ class EmployeeMapper extends MapperQueryStat{
 					$this->addQueryToStat($query);
 				}
 			}
-		}
+		}*/
 	}
 	public function remove(Entity $e){
 		$query='delete from employee where id='.$e->id();

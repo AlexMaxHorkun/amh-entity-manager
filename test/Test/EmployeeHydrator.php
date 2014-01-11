@@ -10,9 +10,13 @@ class EmployeeHydrator extends \AMH\EntityManager\Entity\Hydrator\AbstractHydrat
 		if(isset($data['name'])) $e->setName($data['name']);
 		if(isset($data['salary'])) $e->setSalary($data['salary']);
 		if(isset($data['tasks']) && $data['tasks']){
+			$ids=array();
 			foreach($data['tasks'] as $t){
-				$e->addTask($this->relative('Task',$t));
+				$t=$this->relative('Task',$t);
+				$ids[]=$t->id();
+				$e->addTask($t);
 			}
+			echo PHP_EOL.'Employee ID='.$e->id().' added Tasks IDs=['.implode($ids,',').']'.PHP_EOL;
 		}
 		if(isset($data['mentor']) && $data['mentor']){
 			$e->setMentor($this->relative('Employee',$data['mentor']));
