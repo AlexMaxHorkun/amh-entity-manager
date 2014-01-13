@@ -45,8 +45,9 @@ abstract class AbstractEntity{
 	@return bool TRUE on success.
 	*/
 	protected function load(){
-		if($this->repo && !$this->loaded && !$this->being_loaded){
+		if($this->repo && !$this->loaded && !$this->being_loaded && $this->id){
 			$this->being_loaded=TRUE;
+			$this->loaded=TRUE;
 			$this->loaded=$this->repo->load($this);
 			$this->being_loaded=FALSE;
 		}
@@ -93,10 +94,6 @@ abstract class AbstractEntity{
 		}
 		
 		return TRUE;
-	}
-	
-	public function setLoaded($is=TRUE){
-		$this->loaded=(bool)$is;
 	}
 }
 ?>
