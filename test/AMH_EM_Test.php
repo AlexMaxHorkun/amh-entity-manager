@@ -191,8 +191,14 @@ class AMH_EM_Test extends PHPUnit_Framework_TestCase{
 			$this->assertEquals(count($ts),count($ts_db));
 			for($j=0,$ct=count($ts);$j<$ct;$j++){
 				$this->assertTrue($ts_db[$i] instanceof Test\Task);
-				$this->assertEquals($ts[$i]->id(),$ts_db[$i]->id());
-				$this->assertEquals($ts[$i]->getName(),$ts_db[$i]->getName());
+				$db_has=FALSE;
+				foreach($ts_db as $t_db){
+					if($t_db->id()==$ts[$i]->id()){
+						$db_has=TRUE;
+						break;
+					}
+				}
+				$this->assertTrue($db_has);
 			}
 		}
 	}

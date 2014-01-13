@@ -81,6 +81,9 @@ class Employee extends \AMH\EntityManager\Entity\AbstractEntity{
 	
 	public function addTask(Task $t){
 		$this->load();
+		if(in_array($t,$this->tasks)){
+			return;
+		}
 		$this->tasks[]=$t;
 		if(!in_array($this,$t->assigned())){
 			$t->assign($this);

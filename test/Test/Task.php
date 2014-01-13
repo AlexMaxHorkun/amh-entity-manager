@@ -71,6 +71,10 @@ class Task extends \AMH\EntityManager\Entity\AbstractEntity{
 	Adds Employee to executors list.
 	*/
 	public function assign(Employee $e){
+		$this->load();
+		if(in_array($e,$this->emps)){
+			return;
+		}
 		$this->emps[]=$e;
 		if(!in_array($this,$e->tasks())){
 			$e->addTask($this);
