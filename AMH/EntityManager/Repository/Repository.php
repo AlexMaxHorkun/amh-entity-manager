@@ -281,7 +281,6 @@ class Repository{
 		else{
 			$e=$this->hydrator->create($id);
 			$this->mappers['identity_map']->addToMap($e);
-			$e->setRepository($this);
 			return $e;
 		}
 	}
