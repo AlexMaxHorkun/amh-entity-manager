@@ -232,7 +232,6 @@ class Repository{
 	*/
 	public function persist(AbstractEntity $e){
 		if($this->mappers['identity_map']->addToMap($e,EntityContainer::FLUSH_ACTION_INSERT)){
-			$e->setLoaded(TRUE);
 			return TRUE;
 		}
 		

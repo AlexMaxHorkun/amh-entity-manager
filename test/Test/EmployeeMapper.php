@@ -61,9 +61,6 @@ class EmployeeMapper extends MapperQueryStat{
 				}
 			}
 		}
-		foreach($res as $key=>$row){
-			echo PHP_EOL.'Employee ID='.$row['id'].' tasks=['.implode($row['tasks'],',').']'.PHP_EOL;
-		}
 		return $res;
 	}
 	
