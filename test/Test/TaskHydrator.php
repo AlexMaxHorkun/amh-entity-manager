@@ -10,7 +10,7 @@ class TaskHydrator extends \AMH\EntityManager\Entity\Hydrator\AbstractHydrator{
 		if(isset($data['name'])) $e->setName($data['name']);
 		if(isset($data['complete_time'])) $e->setCompleteTime(new \DateTime($data['complete_time']));
 		if(isset($data['complete']) && $data['complete']) $e->complete();
-		if(isset($data['emps'])) $e->assignAll($this->relatives('Employee',$data['emps']));
+		/*if(isset($data['emps'])) $e->assignAll($this->relatives('Employee',$data['emps']));*/
 	}
 	
 	public function extract(\AMH\EntityManager\Entity\AbstractEntity $e){
